@@ -226,7 +226,7 @@ git push
 
 ## 보고서 작성 가이드
 
-`docs/reports/phase_00_setup_report.html` 작성 (Claude가 MacBook에서). 필수 섹션:
+`docs/reports/phase_00_setup_report.md` 작성 (Claude가 MacBook에서). 필수 섹션:
 
 1. **요약** — 3머신 셋업 완료 여부
 2. **머신별 환경 정보** — macbook / vastai / (선택) local_a100, 각각 table

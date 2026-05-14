@@ -21,7 +21,7 @@ Sub-task 가 필요한 경우:
 4. **구현 사양** — 어떤 파일을 만들/수정하나, 함수 시그니처
 5. **실행 방법** — 명령어 (vast.ai + 로컬 양쪽)
 6. **결과 저장 형식** — `results/step_XX/{env}/summary.json` 의 정확한 schema
-7. **보고서 작성 가이드** — `docs/reports/step_XX_report.html`에 포함할 내용
+7. **보고서 작성 가이드** — `docs/reports/step_XX_report.md`에 포함할 내용
 8. **다음 step 게이트** — 통과 조건 + 사용자 리뷰 요청 형식
 
 ## 진행 순서

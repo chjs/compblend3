@@ -396,7 +396,7 @@ ssh vast 'cd compblend3 && git add results docs && git commit -m "[step_XX] resu
    ↓
 MacBook에서 git pull (결과 회수)
    ↓
-보고서 docs/reports/step_XX_report.html 작성 (MacBook에서)
+보고서 docs/reports/step_XX_report.md 작성 (MacBook에서)
    ↓
 git add + commit + push
    ↓
@@ -404,7 +404,7 @@ git add + commit + push
 ```
 
 ### 9.2 매 step 필수 산출물 (compblend2 패턴)
-1. **docs/reports/step_XX_report.html** — HTML 한글, semantic structure, Gmail-compatible tables, color badges
+1. **docs/reports/step_XX_report.md** — Markdown 한글, GitHub-native 렌더링, 이모지 badge (✅ ⚠️ ❌ 🔵 ⬜)
 2. **docs/prompts/step_XX_prompt.md** — 해당 step 시작 시 사용자 프롬프트 기록
 3. **PROGRESS.md** 업데이트 — 완료 표시, 다음 step 명시
 4. **results/step_XX/{vastai,local}/summary.json** — 표준 포맷 결과
@@ -537,3 +537,9 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - CLAUDE.md §5.4 신설: "매 세션 종료 시 표준 요약문" — 세션 종료 신호 시점에 핸드오프용 plain-text 요약을 마지막 응답에 출력
   - 청자는 다음 세션의 Claude, 용도는 (a) 현재 상태 파악 (b) 다음 세션 진입 프롬프트 생성
   - 양식 8개 섹션 (세션 범위 / 완료된 작업 / 미완·보류 / 다음 세션 진입점 / 의사결정 대기 / 정직성 노트 / vast.ai 사용 / 변경된 핵심 파일), brief 보고와 별개로 출력, diff·긴 인용·표 ❌, 사실만
+- **2026-05-14 v7**: 보고서 양식 HTML → Markdown 전환 (사용자 결정)
+  - §9.2 / CLAUDE.md §5.2 / docs/design/report_style.md: "HTML 한글, Gmail-compatible tables, color badges" → "Markdown 한글, GitHub-native 렌더링, 이모지 badge (✅ ⚠️ ❌ 🔵 ⬜)"
+  - docs/design/report_style.md 전체 재작성: HTML/inline CSS/Gmail table 마크업 가이드 제거 → Markdown table 문법 + 이모지 badge 매핑
+  - repo 전역 `docs/reports/*.html` 참조 17곳 → `.md`. history/log 3곳(§13 v2 이력, docs/prompts/phase_00_prompt.md 2곳)은 append-only 원칙상 의도적 유지
+  - 기존 docs/reports/phase_00_setup_report.html은 변환하지 않고 그대로 둠 (one-off legacy, 시간 비효율)
+  - 검토 채널: GitHub에서 직접 (이메일 ❌)

@@ -11,7 +11,7 @@
 1. **`GOAL.md`** — 우리가 왜 이걸 하는가 (1분)
 2. **`PROGRESS.md`** — 어디까지 됐고 다음은 무엇인가 (1분)
 3. **현재 step의 `tasks/step_XX_*.md`** — 구체적 작업 지시
-4. **이전 step의 `docs/reports/step_(XX-1)_report.html`** — 직전 완료 내용 (필요시)
+4. **이전 step의 `docs/reports/step_(XX-1)_report.md`** — 직전 완료 내용 (필요시)
 5. **`DECISIONS.md`** — 결정사항 참조 (필요시)
 
 이 순서를 건너뛰지 않는다. 작업 drift 방지를 위한 닻이다.
@@ -36,7 +36,7 @@ Step N 통과 못 하면 Step N+1 진행 금지.
 
 ### 원칙 3: Mandatory reporting
 매 step 완료 시 다음을 모두 생성:
-1. `docs/reports/step_XX_report.html` (HTML 한글, semantic structure, table-heavy)
+1. `docs/reports/step_XX_report.md` (Markdown 한글, GitHub-native 렌더링, table-heavy)
 2. `docs/prompts/step_XX_prompt.md` (step 시작 프롬프트 기록)
 3. `PROGRESS.md` 업데이트
 4. `results/step_XX/vastai/summary.json` (Claude Code 결과)
@@ -125,7 +125,7 @@ ssh vast 'cd compblend3 && git add results docs && git commit -m "[step_XX] resu
    ↓
 MacBook에서 git pull로 결과 회수
    ↓
-MacBook에서 docs/reports/step_XX_report.html 작성
+MacBook에서 docs/reports/step_XX_report.md 작성
    ↓
 docs/prompts/step_XX_prompt.md 작성
    ↓
@@ -171,13 +171,12 @@ git add + commit + push
 - 함수명, 클래스명, 코드 심볼, 파일 경로, tensor shape 표기는 원문 유지
 - 영어 필요 시 한 줄 아래에 한글 보충
 
-### 5.2 HTML 보고서 (`docs/reports/step_XX_report.html`)
-- Semantic HTML 구조: `<h1>`, `<h2>`, `<section>`
-- Table-heavy (수정 파일, tensor shape, test 결과, risks)
-- Inline CSS (Gmail-compatible)
-- Color badges: PASS/FAIL/RISK/INFO
+### 5.2 Markdown 보고서 (`docs/reports/step_XX_report.md`)
+- Markdown heading 계층: `#`, `##`, `###`
+- Table-heavy (수정 파일, tensor shape, test 결과, risks) — GitHub-native Markdown table
+- 이모지 badge: ✅ PASS / ❌ FAIL / ⚠️ RISK / 🔵 INFO
 
-권장 CSS와 마크업 패턴은 `docs/design/report_style.md` 참조 (compblend2 패턴).
+권장 마크업 패턴은 `docs/design/report_style.md` 참조. 검토는 GitHub에서 한다.
 
 ### 5.3 보고서 필수 섹션
 1. **요약** (1-2 문단)
@@ -334,7 +333,7 @@ results: results/step_XX/vastai/summary.json
 ### 8.3 리뷰 요청
 Step 완료 시 다음을 사용자에게 명시:
 1. 완료된 작업 요약
-2. `docs/reports/step_XX_report.html` 링크
+2. `docs/reports/step_XX_report.md` 링크
 3. `results/step_XX/vastai/summary.json` 핵심 수치
 4. 알려진 한계 / 의심스러운 부분
 5. 사용자 로컬 A100 검증이 필요한 step이면 그 사실 명시
@@ -363,7 +362,7 @@ Step 완료 시 다음을 사용자에게 명시:
 - [ ] GOAL.md 읽음
 - [ ] PROGRESS.md 읽음 (current step 확인)
 - [ ] 현재 step의 tasks/step_XX_*.md 읽음
-- [ ] 직전 step의 docs/reports/step_(XX-1)_report.html 훑음
+- [ ] 직전 step의 docs/reports/step_(XX-1)_report.md 훑음
 - [ ] Working directory가 올바른 step 브랜치인지 확인
 
 세션 종료 시:

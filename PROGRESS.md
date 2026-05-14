@@ -138,5 +138,9 @@ Phase 0-C (로컬 A100 셋업)는 사용자가 별도로 진행. Phase 0 완료 
   - vast.ai를 step별 신규 할당 방식으로 전환 (Claude 자동 할당/destroy). DECISIONS.md §8 재정리, §8.4 신설
   - Phase 0-B를 Phase 0 게이트에서 분리 (Step 0 시작 직전 진행)
   - `scripts/vast_helper.py` 신설 (인터페이스 명세 placeholder)
+- **2026-05-14 (v6)**: 보고서 양식 HTML → Markdown 전환
+  - DECISIONS.md §9.2 / CLAUDE.md §5.2 / `docs/design/report_style.md`: HTML+Gmail-compatible tables+color badges → Markdown+GitHub-native 렌더링+이모지 badge (✅ ⚠️ ❌ 🔵 ⬜)
+  - repo 전역 `docs/reports/*.html` 참조 17곳 → `.md`. history/log 3곳(DECISIONS.md §13 v2, `docs/prompts/phase_00_prompt.md` 2곳)은 의도적 유지
+  - 기존 `docs/reports/phase_00_setup_report.html`은 변환하지 않고 그대로 둠. 검토는 GitHub에서 (이메일 ❌). DECISIONS.md §13 v7 기록
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)

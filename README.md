@@ -33,7 +33,7 @@ compblend3/
 ├── docs/
 │   ├── context/         # session_resume.md(세션 복원 가이드). project_goal.md·current_status.md는 GOAL.md·PROGRESS.md redirect stub
 │   ├── setup/           # macbook_setup.md, vastai_setup.md, local_a100_setup.md, troubleshooting.md
-│   ├── reports/         # step_XX_report.html (HTML 한글)
+│   ├── reports/         # step_XX_report.md (Markdown 한글)
 │   ├── prompts/         # step_XX_prompt.md
 │   └── design/          # 설계 노트, invariant 정의
 ├── tasks/               # step_XX_*.md — self-contained 작업 지시

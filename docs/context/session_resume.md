@@ -97,7 +97,7 @@ compblend3 프로젝트, 이전 세션이 중간에 끊긴 상태입니다.
 - 작업 규칙 (CLAUDE.md)
 - 진행 상태 (PROGRESS.md)
 - 각 step의 작업 지시 (tasks/*.md)
-- 보고서 (docs/reports/*.html)
+- 보고서 (docs/reports/*.md)
 - 결과 데이터 (results/*/summary.json)
 
 ### 2.2 복원되지 않는 것
@@ -162,7 +162,7 @@ compblend3 프로젝트입니다. 작업 상태가 불명확합니다.
 다음을 순서대로 해주세요:
 1. git log --oneline -20 으로 최근 commit 확인
 2. git status 로 미완 변경사항 확인
-3. PROGRESS.md 와 가장 최근 step의 docs/reports/step_XX_report.html 비교
+3. PROGRESS.md 와 가장 최근 step의 docs/reports/step_XX_report.md 비교
 4. 차이가 있다면 어느 쪽이 맞는지 추정하고 저에게 알려주세요
 
 확정 전까지 어떤 파일도 수정하지 마세요.
