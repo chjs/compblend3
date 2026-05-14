@@ -19,7 +19,7 @@
 
 | Phase | 상태 | 비고 |
 |---|---|---|
-| **Phase 0** — 환경 셋업 | 🔵 **IN PROGRESS** | uv venv, torch 2.10+cu128, 모델 다운로드, Loong manifest |
+| **Phase 0** — 환경 셋업 | 🔵 **IN PROGRESS** | MacBook venv ✅ + LMCache pinning ✅. vast.ai 셋업·모델 다운로드·Loong manifest는 Step 0 시작 시 (Phase 0-B) |
 | Phase 1 — Step 0~3 (HF forward + cache) | ⬜ 대기 | |
 | Phase 2 — Step 4~6 (CacheBlend 핵심) | ⬜ 대기 | |
 | Phase 3 — Step 7 (HKVD) | ⬜ 대기 | |
@@ -107,17 +107,20 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 ## 다음 행동 (Next actions)
 
-Phase 0-A (MacBook 셋업) + Phase 0-D (LMCache pinning) 완료. 남은 것:
+Phase 0-A (MacBook 셋업) + Phase 0-D (LMCache pinning) + Phase 0-A 보고서 작성 완료. 남은 것:
 
-1. `docs/reports/phase_00_setup_report.html` 작성 (Phase 0-A + 0-D 결과, 워크플로우 변경 포함)
-2. 사용자 리뷰 요청 → 승인 대기
-3. 승인 시 Step 0 진입. **Step 0 시작 시 Phase 0-B를 `scripts/vast_helper.py`로 자동 수행**:
+1. **사용자 리뷰** → Phase 0 완료 게이트 승인 대기
+2. 승인 시 Step 0 진입. **Step 0 시작 시 Phase 0-B를 `scripts/vast_helper.py`로 자동 수행**:
    - 인스턴스 할당 (A100-SXM4 80GB) → `~/.ssh/config` `Host vast` 자동 등록
    - `setup/install_vastai.sh` 실행 → `.env`에 HF_TOKEN 전송
    - `check_env.py` (vastai) / 모델 다운로드 / Loong manifest / `sanity_forward`
    - Step 0 실험 → 결과 git push → 인스턴스 destroy
 
 Phase 0-C (로컬 A100 셋업)는 사용자가 별도로 진행. Phase 0 완료 게이트의 일부 ❌, Step 0 진입 직전에 권장.
+
+## 다음 세션 첫 행동
+
+- 별도 round: `docs/setup/vastai_setup.md`, `docs/context/*.md` 구 워크플로우 흔적 검토 후 patch
 
 ---
 

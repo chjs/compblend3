@@ -1,0 +1,66 @@
+{
+  "env_tag": "macbook",
+  "all_ok": true,
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64",
+    "release": "25.4.0"
+  },
+  "checks": [
+    {
+      "name": "Python",
+      "value": "3.10.20",
+      "status": "OK",
+      "expected": "3.10.x"
+    },
+    {
+      "name": "PyTorch",
+      "value": "2.10.0",
+      "status": "OK",
+      "expected": "2.10.x (CPU OK)"
+    },
+    {
+      "name": "CUDA (from torch)",
+      "value": "None",
+      "status": "INFO",
+      "expected": "not required on macbook"
+    },
+    {
+      "name": "GPU",
+      "value": "not available (CPU mode)",
+      "status": "INFO",
+      "expected": "not required on macbook"
+    },
+    {
+      "name": "Deterministic mode",
+      "value": "not testable without GPU",
+      "status": "INFO",
+      "expected": "not required on macbook"
+    },
+    {
+      "name": "Transformers",
+      "value": "4.51.3",
+      "status": "OK",
+      "expected": ">=4.50"
+    },
+    {
+      "name": "HF_TOKEN",
+      "value": "set",
+      "status": "INFO",
+      "expected": "optional on macbook (실험은 vast.ai에서)"
+    },
+    {
+      "name": "Environment tag",
+      "value": "macbook",
+      "status": "OK",
+      "expected": ""
+    },
+    {
+      "name": "nvidia-smi",
+      "value": "not available (macOS)",
+      "status": "INFO",
+      "expected": "not required on macbook"
+    }
+  ],
+  "timestamp": "2026-05-14T20:44:38+09:00"
+}
