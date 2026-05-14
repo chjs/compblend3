@@ -43,6 +43,7 @@
       272
     ]
   },
+  "last_token_top1_decoded": "Paris",
   "details": {
     "prompt_A": "The capital of France is",
     "prompt_B": "Photosynthesis is the process by which",

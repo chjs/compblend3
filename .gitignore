@@ -82,6 +82,8 @@ logs/
 .cache/
 .hf_cache/
 .transformers_cache/
+# HF hub 캐시 — HF_HOME 빈 값으로 cwd에 생길 수 있음 (repo 루트 오염 방지)
+hub/
 
 # Reference 저장소 (별도 clone, 본 repo에 ❌)
 vendor/

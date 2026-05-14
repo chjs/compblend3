@@ -55,11 +55,11 @@ def logits_summary(logits: torch.Tensor) -> dict:
 
 
 def run_forward(model, tokenizer, prompt: str, seed: int = 42) -> torch.Tensor:
-    """단일 forward."""
+    """단일 forward. use_cache=False — KV cache 미사용 plain forward (DynamicCache는 Step 2)."""
     set_all_seeds(seed)
     ids = tokenizer(prompt, return_tensors="pt").to(model.device)
     with torch.no_grad():
-        out = model(**ids)
+        out = model(**ids, use_cache=False)
     return out.logits
 
 
@@ -103,6 +103,11 @@ def main():
 
     inv_0_1_pass = len(set(r["sha256"] for r in runs_A)) == 1
 
+    # prompt_A last-token top-1 디코드 — sanity check (가중치/토크나이저 정상 여부 확인)
+    top1_id = runs_A[0]["summary"]["last_token_top5_indices"][0]
+    top1_decoded = tokenizer.decode([top1_id])
+    print(f"  prompt_A last-token top-1: id={top1_id} -> {top1_decoded!r}")
+
     # Invariant 0.2: 다른 입력
     print(f"[3/4] Invariant 0.2 — 다른 입력 1회 실행")
     logits_B = run_forward(model, tokenizer, prompt_B, seed=args.seed)
@@ -138,6 +143,7 @@ def main():
         # 비교 스크립트가 사용할 표준 필드
         "logits_sha256": runs_A[0]["sha256"],  # 대표 sha
         "logits_summary": runs_A[0]["summary"],
+        "last_token_top1_decoded": top1_decoded,  # prompt_A sanity — "Paris" 기대
         "details": {
             "prompt_A": prompt_A,
             "prompt_B": prompt_B,
