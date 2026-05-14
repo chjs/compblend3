@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment variables (secrets)
+.env
+.env.local
+
+# Model weights (절대 commit ❌)
+*.safetensors
+*.bin
+*.pt
+*.pth
+models/
+~/models/
+
+# Data (실데이터는 commit ❌, manifest만 commit ✅)
+data/loong/
+data/raw/
+data/processed/
+*.jsonl
+*.parquet
+# manifest는 예외적으로 commit (작아서)
+!data/manifests/
+
+# Results — summary.json만 commit, 큰 tensor dump는 ❌
+results/**/*.pt
+results/**/*.npy
+results/**/*.pkl
+results/**/full_logits/
+results/**/tensor_dumps/
+# summary.json은 commit
+!results/**/summary.json
+
+# Logs
+*.log
+logs/
+
+# Cache directories
+.cache/
+.hf_cache/
+.transformers_cache/
+
+# Reference 저장소 (별도 clone, 본 repo에 ❌)
+vendor/
+references/
+LMCache/
+KVzip/
+CacheBlend/
+Loong/
+
+# 임시 디렉토리
+tmp/
+scratch/
+
+# OS
+Thumbs.db
+.DS_Store
