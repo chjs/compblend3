@@ -147,5 +147,6 @@ Phase 0 완료 (사용자 리뷰 승인 2026-05-14). Step 0 진행 중 — `step
   - Phase 0 완료 게이트 3개 통과 (사용자 리뷰 승인 2026-05-14)
   - 현재 step = Step 0 (HF eager forward 결정론 검증), 브랜치 `step/step_00_determinism_check`
   - CLAUDE.md §7.1 / DECISIONS.md §9.6 브랜치 워크플로우 보강 (--no-ff merge, PR ❌, 브랜치 삭제, main 직접 commit 예외 (a)(b)), `[meta]` commit prefix 정의 — DECISIONS.md §13 v8
+- **2026-05-15 (Step 0 진행)**: `scripts/vast_helper.py` 구현(commit `009e1b6`). 첫 vast.ai 인스턴스 할당 시도 — id 36764141 (A100-SXM4 80GB, $0.641/h), 할당·`Host vast` alias·SSH·GPU(driver 570.172.08) 확인 OK. `install_vastai.sh`가 디스크 부족으로 실패(`/` overlay 12GB, torch 2.10+cu128 설치 중 No space left) → 안전 규칙대로 즉시 destroy. 원인 추정: offer의 disk 용량 부족 + `--disk 200` 미반영. 다음: `search offers`에 disk 용량 필터 추가 후 재시도.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)
