@@ -54,6 +54,10 @@ import warnings
 warnings.filterwarnings("ignore", message=".*flash.*")
 ```
 
+### 증상: repo 루트에 `hub/` 디렉토리가 생김
+
+`.env`의 `HF_HOME=` (빈 값)을 source하면 HF가 cwd에 `hub/` 캐시를 만든다. 해결: `.env`에서 `HF_HOME` 줄을 주석 처리하거나 절대경로로 설정 (`.env.example` 참고). `.gitignore`에 `hub/` 포함됨.
+
 ---
 
 ## 3. 결정론 / 재현성
