@@ -31,7 +31,7 @@ compblend3/
 ├── .gitignore
 ├── pyproject.toml
 ├── docs/
-│   ├── context/         # project_goal.md, current_status.md, session_resume.md
+│   ├── context/         # session_resume.md(세션 복원 가이드). project_goal.md·current_status.md는 GOAL.md·PROGRESS.md redirect stub
 │   ├── setup/           # macbook_setup.md, vastai_setup.md, local_a100_setup.md, troubleshooting.md
 │   ├── reports/         # step_XX_report.html (HTML 한글)
 │   ├── prompts/         # step_XX_prompt.md

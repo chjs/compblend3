@@ -120,7 +120,7 @@ Phase 0-C (로컬 A100 셋업)는 사용자가 별도로 진행. Phase 0 완료 
 
 ## 다음 세션 첫 행동
 
-- 별도 round: `docs/setup/vastai_setup.md`, `docs/context/*.md` 구 워크플로우 흔적 검토 후 patch
+- Phase 0 리뷰 완료 후 Step 0 진입 (`scripts/vast_helper.py` 구현 + 첫 vast.ai 인스턴스 할당부터)
 
 ---
 
