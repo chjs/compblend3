@@ -258,12 +258,29 @@ def setup_instance(ssh_host: str, ssh_port: int) -> None:
 def destroy_instance(instance_id: int) -> None:
     """step 완료 후 인스턴스 destroy.
 
-    사용자 승인 게이트 ❌ (DECISIONS.md §8.4). destroy 확인은 사용자가
-    vast.ai 콘솔에서 별도로 한다.
+    `vastai destroy instance`는 `[y/N]` 대화형 확인을 요구한다 — stdin 없이
+    실행하면 EOF가 "N"으로 처리되어 rc=0이어도 destroy되지 않으므로 "y"를
+    stdin으로 전달한다. destroy 후 인스턴스 목록에서 실제로 사라졌는지 확인한다.
+
+    사용자 승인 게이트 ❌ (DECISIONS.md §8.4).
     """
     print(f"[destroy] instance {instance_id}")
-    _run(["vastai", "destroy", "instance", str(instance_id)])
-    print("  destroy 요청 완료 (콘솔 확인은 사용자)")
+    _run(["vastai", "destroy", "instance", str(instance_id)], input_text="y\n")
+
+    # rc=0이어도 실제 destroy 안 됐을 수 있으니 목록에서 사라졌는지 확인.
+    time.sleep(5)
+    res = _run(["vastai", "show", "instances", "--raw"], check=False)
+    alive_ids: list = []
+    if res.returncode == 0:
+        try:
+            alive_ids = [i.get("id") for i in json.loads(res.stdout)]
+        except json.JSONDecodeError:
+            pass
+    if instance_id in alive_ids:
+        raise RuntimeError(
+            f"destroy 후에도 instance {instance_id}가 목록에 남아 있음 — 수동 확인 필요"
+        )
+    print(f"  destroy 확인 완료 (instance {instance_id} 제거됨)")
 
 
 if __name__ == "__main__":
