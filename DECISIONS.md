@@ -311,37 +311,52 @@ Stage 5: 실제 데이터셋             → Loong F1 비교
 
 ## 8. 인프라
 
-### 8.1 3머신 구조 + SSH 자동화
+### 8.1 3머신 구조
 
-- **MacBook M2** (Claude Code 실행): 코드 작성/편집/git, vast.ai SSH 트리거
-- **vast.ai A100-SXM4 80GB** (primary 실험): 모든 step 실험 실행
+- **MacBook M2** (Claude Code 실행): 코드 작성/편집/git, vast.ai SSH/API 트리거
+- **vast.ai A100-SXM4 80GB** (primary 실험): 모든 step 실험 실행. **step별 신규 할당** — 영구 임대 ❌.
 - **사용자 로컬 A100 80GB** (occasional 검증): 사용자가 "꼭 필요한 검증"이라 판단한 step만 별도 실행
+
+vast.ai 인스턴스는 step 시작 시 새로 할당하고 step 종료 시 destroy한다 (§8.4). 이전 가정(장기 임대된 단일 인스턴스를 ping으로 깨워 쓴다)은 폐기.
 
 ### 8.2 SSH 자동화 규칙
 
 Claude Code(MacBook)가 vast.ai에 SSH로 직접 명령 트리거. 사용자 중간 개입 없음.
 
 규칙 3개:
-1. **SSH alias 고정**: 사용자 `~/.ssh/config`에 `Host vast` alias 정의. Claude는 `ssh vast '...'` 만 사용. IP/포트 inline ❌.
-2. **인스턴스 상태 ping 먼저**: 매 step 시작 시 `ssh vast 'nvidia-smi'` 가벼운 확인. 인스턴스가 죽어있으면 사용자에게 켜달라고 요청 후 멈춤. **Claude가 자동으로 인스턴스 spawn 시도 ❌**.
-3. **시크릿은 vast.ai의 .env에서만**: SSH 명령 인라인에 `HF_TOKEN=hf_...` 같은 시크릿 절대 ❌. vast.ai의 `.env`는 인스턴스 셋업 시 한 번 채워두고 그걸 source.
+1. **SSH alias 고정**: `~/.ssh/config`의 `Host vast` alias 사용. Claude는 `ssh vast '...'` 만 사용. IP/포트 inline ❌. step별 인스턴스 할당 시 Claude가 이 `Host vast` 블록만 추가/갱신한다 (다른 항목 건드리지 ❌, 백업 권장 — §8.4의 `ssh_alias_register`).
+2. **인스턴스 확인 먼저, 없으면 자동 할당**: 매 step 시작 시 인스턴스 상태 확인. 인스턴스가 없거나(step별 할당이라 대부분의 경우) 죽어있으면 **Claude가 자동으로 새 인스턴스를 할당**한다 (§8.4). ping(`ssh vast 'nvidia-smi'`)은 할당 후 SSH 연결/GPU 확인용.
+3. **시크릿은 인라인 ❌**: SSH 명령 인라인이나 stdout/log에 `HF_TOKEN`, `VAST_API_KEY` 등 시크릿 값 절대 ❌. vast.ai의 `.env`는 인스턴스 셋업 시 한 번 채워두고 그걸 source. `VAST_API_KEY`도 동일 규칙 — `echo $VAST_API_KEY` 같은 명령 금지.
 
-### 8.3 파괴적 명령
+### 8.3 vast.ai 명령·API 사용 정책
 
-vast.ai는 가상 인스턴스라 자유. `rm -rf`, `pip uninstall`, 인스턴스 내 어떤 명령도 사용자 사전 승인 없이 OK.
-(인스턴스 자체의 destroy / stop은 사용자 권한 — Claude가 vast.ai API 호출 ❌)
+- **인스턴스 내부 명령**: vast.ai는 가상 인스턴스라 자유. `rm -rf`, `pip uninstall`, 인스턴스 내 어떤 명령도 사용자 사전 승인 없이 OK.
+- **vast.ai API**: Claude가 `VAST_API_KEY`로 vast.ai API/CLI를 자유롭게 사용한다 — 인스턴스 검색·할당·destroy 포함 (§8.4).
+- **시크릿**: `VAST_API_KEY`/`HF_TOKEN` 등 시크릿 값은 stdout/log/명령 인라인에 노출 ❌.
+- 이전 규정("인스턴스 destroy/stop은 사용자 권한 — Claude가 API 호출 ❌")은 폐기.
 
-### 8.4 결과 회수 워크플로우
+### 8.4 인스턴스 lifecycle
+
+vast.ai 인스턴스는 step 단위로 살았다 죽는다. Claude가 전 과정을 자동 관리한다.
+
+- **할당**: step 시작 시 Claude가 A100-SXM4 80GB 인스턴스를 자동 할당. **사용자 승인 게이트 ❌**.
+- **destroy**: step 완료(결과 git push 회수 후) 시 Claude가 인스턴스를 destroy. **사용자 승인 게이트 ❌**.
+- **destroy 확인**: 사용자가 vast.ai 콘솔에서 별도로 확인 (Claude의 책임 영역 밖).
+- **비용 모니터링**: 사용자 책임. Claude는 비용을 신경 쓰지 않는다.
+- **안전장치 최소화**: 이전 프로젝트에서 안전 과잉이 비효율을 낳은 경험에 따라, 인스턴스 관리에 사용자 확인 게이트를 두지 않는다.
+- 도구: `scripts/vast_helper.py` (Step 0 진입 직전 구현).
+
+### 8.5 결과 회수 워크플로우
 
 vast.ai에서 실험 → `results/step_XX/vastai/summary.json` 작성 → vast.ai에서 git add + commit + push → MacBook에서 git pull로 회수.
 scp 사용 ❌ (git 한 군데로 통일).
 
-### 8.5 환경별 결과 분리
+### 8.6 환경별 결과 분리
 - `results/step_XX/vastai/` — 모든 step에서 채워짐
 - `results/step_XX/local_a100/` — 사용자가 결정한 step만, 대부분 비어 있을 수 있음
 - `results/step_XX/macbook/` — 존재하지 않음 (smoke test 결과만 별도로)
 
-### 8.6 결과 비교 강도
+### 8.7 결과 비교 강도
 1. **1순위: SHA-256 bitwise 일치** (vastai vs local_a100, 운 좋으면 일치)
 2. **2순위: atol 1e-5 일치** (환경 차이가 있을 때 fallback)
 3. **3순위: logit top-k 일치** (Step 8 같은 task metric 단계)
@@ -504,3 +519,17 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - §10 비목표에 HF↔vLLM bitwise 일치 ❌, sampling output 일치 ❌, multi-GPU ❌, compressed 직접 blend ❌ 명시
   - §11 KVzip Integration Hypothesis 신설 (3-phase 가설, 1차 = decompress 후 blend default)
   - 미해결로 남긴 것: §11 최종 결정은 Phase 7 진입 시. recompute_ratio=1.0 invariant 전제조건은 step_06 task 파일에 반영.
+- **2026-05-14 v5**: vast.ai 인스턴스 관리 워크플로우 변경 (사용자 결정)
+  - §8 인프라 전면 재정리: vast.ai는 **step별 신규 할당** (영구 임대 가정 폐기)
+  - §8.1 제목 "3머신 구조 + SSH 자동화" → "3머신 구조", step별 할당 명시
+  - §8.2 SSH 규칙 2 변경: 인스턴스 없거나 죽으면 Claude가 자동 할당 (과거: 사용자에게 요청 후 멈춤)
+  - §8.3 정정: "파괴적 명령" → "vast.ai 명령·API 사용 정책". Claude가 vast.ai API 자유 사용 (과거: "API 호출 ❌"). 시크릿 값 노출 ❌ 유지·강화 (`VAST_API_KEY` 포함)
+  - §8.4 신설: 인스턴스 lifecycle — Claude 자동 할당/destroy, **사용자 승인 게이트 ❌**, destroy 확인은 사용자가 콘솔에서, 비용 모니터링은 사용자 책임, 안전장치 최소화
+  - 사용자 선호 인용: "안전 과잉이 비효율" / "destroy 확인은 내가 한다" / "비용 모니터링은 사용자 책임"
+  - 구 §8.4~8.6 → §8.5~8.7로 번호 이동 (본문 동일)
+  - tasks/phase_00_setup.md: Phase 0 완료 게이트에서 0-B(vast.ai) 항목 제거 — Step 0 시작 직전 진행
+  - PROGRESS.md: Phase 0-A / 0-D 완료 표시, Phase 0-B 재분류, 변경 이력 v5
+  - scripts/vast_helper.py 신설 (인터페이스 명세 placeholder, Step 0 진입 직전 구현). scripts/vast_run.sh는 SSH 명령 래퍼로 그대로 유지 (기능 겹침 없음)
+  - CLAUDE.md §3.1/§3.2/§3.3/§4/§4.3/§11 동기 수정 (DECISIONS.md §8 참조 형태, 규칙 본문은 복사 ❌)
+  - patches/lmcache-vllm-cacheblend: LMCache README가 unified diff가 아닌 수동 삽입 코드블록이라 `.md`로 저장 (`.patch` ❌). 관련 경로 참조 수정
+  - 정직성 기록: LMCache README 1차 회수에 쓴 WebFetch가 원문에 없는 소제목을 임의 추가 → `gh api`+`curl` raw 교차검증으로 바로잡음

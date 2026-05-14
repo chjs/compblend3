@@ -71,20 +71,20 @@ Step N 통과 못 하면 Step N+1 진행 금지.
 | 역할 | 머신 | 환경 |
 |---|---|---|
 | **Claude Code 실행** (지금 너!) | MacBook Air M2 | macOS, ARM64, GPU 없음. uv venv, Python 3.10, transformers/torch는 smoke test 용도만. |
-| **실험 (primary)** | vast.ai A100-SXM4 80GB | Ubuntu, x86_64, Python 3.10, PyTorch 2.10.0+cu128, CUDA 12.8 |
+| **실험 (primary)** | vast.ai A100-SXM4 80GB (step별 신규 할당) | Ubuntu, x86_64, Python 3.10, PyTorch 2.10.0+cu128, CUDA 12.8 |
 | **추가 검증 (occasional)** | 사용자 로컬 A100 80GB | Ubuntu 24.04, 동일 환경 (vast.ai와 거의 일치) |
 
 Claude Code는 MacBook에서 돌아간다. **GPU 의존 코드는 MacBook에서 실행 ❌, 항상 ssh vast로 전송**.
 
 ### 3.2 SSH 자동화 규칙
 
-1. **SSH alias 고정**: `ssh vast '...'` 만 사용. IP/포트 inline ❌. 사용자가 `~/.ssh/config`에 `Host vast` 정의해둠.
-2. **인스턴스 상태 ping 먼저**: 매 step 시작 시 `ssh vast 'nvidia-smi'` 가벼운 확인. 죽어있으면 사용자에게 켜달라고 요청 후 멈춤. **자동 spawn 시도 ❌**.
-3. **시크릿은 vast.ai의 .env에서만**: SSH 명령 인라인에 `HF_TOKEN=...` 같은 시크릿 절대 ❌.
+1. **SSH alias 고정**: `ssh vast '...'` 만 사용. IP/포트 inline ❌. 인스턴스 할당 시 Claude가 `~/.ssh/config`의 `Host vast` 블록만 추가/갱신 (다른 항목 건드리지 ❌, 백업 권장).
+2. **인스턴스 없으면 자동 할당**: vast.ai 인스턴스는 step별 신규 할당. 매 step 시작 시 인스턴스가 없거나 죽어있으면 Claude가 `scripts/vast_helper.py`로 자동 할당. 상세는 DECISIONS.md §8.4.
+3. **시크릿은 인라인/로그 ❌**: SSH 명령 인라인이나 stdout/log에 `HF_TOKEN`, `VAST_API_KEY` 등 시크릿 값 절대 ❌. vast.ai의 `.env`에서만 source.
 
-### 3.3 파괴적 명령
+### 3.3 파괴적 명령 + vast.ai API
 
-vast.ai는 가상 인스턴스라 자유. `rm -rf`, `pip uninstall` 등 인스턴스 내 어떤 명령도 사용자 사전 승인 없이 OK. 다만 인스턴스 자체의 destroy/stop은 사용자 권한이라 Claude가 vast.ai API 호출 ❌.
+vast.ai는 가상 인스턴스라 자유. `rm -rf`, `pip uninstall` 등 인스턴스 내 어떤 명령도 사용자 사전 승인 없이 OK. 인스턴스 자체의 할당/destroy도 Claude가 `VAST_API_KEY`로 자동 수행 (사용자 승인 게이트 ❌). 상세는 DECISIONS.md §8.3~§8.4.
 
 ### 3.4 결과 회수
 
@@ -108,8 +108,9 @@ vast.ai에서 실험 → vast.ai에서 git add+commit+push → MacBook에서 git
    ↓
 GOAL.md, PROGRESS.md, tasks/step_XX_*.md 읽기
    ↓
-ssh vast 'nvidia-smi' — 인스턴스 살아있는지 ping
-   ↓ (살아있음 — 죽어있으면 사용자에게 요청 후 멈춤)
+인스턴스 확인 — 없거나 죽었으면 Claude가 자동 할당 (scripts/vast_helper.py)
+   ↓
+ssh vast 'nvidia-smi' — 할당된 인스턴스 SSH/GPU 확인
 [필요 시 sub-task로 분할]
    ↓
 MacBook에서 구현 코드 작성 + unit test 작성
@@ -149,10 +150,10 @@ git add + commit + push
 - 새 세션에서 이어받기 가능하도록 "다음 행동" 명시
 - 절반 한 채로 commit 금지
 
-### 4.3 vast.ai 인스턴스가 죽어있을 때
-1. 사용자에게 vast.ai 콘솔에서 인스턴스 켜달라고 요청
-2. 인스턴스 살아난 후 `ssh vast 'cd compblend3 && git pull'` 로 최신 코드 동기화
-3. 그 다음 실험 트리거
+### 4.3 vast.ai 인스턴스 lifecycle
+- step 시작 시 Claude가 자동 할당, step 완료 시 자동 destroy (사용자 승인 게이트 ❌).
+- destroy 확인은 사용자가 vast.ai 콘솔에서 별도로. 비용 모니터링은 사용자 책임.
+- 상세는 DECISIONS.md §8.4.
 
 ### 4.4 사용자 로컬 A100 검증
 대부분 step에서는 vast.ai 단독으로 진행. 다음 경우에만 로컬 A100 검증 권장:
@@ -327,9 +328,9 @@ Step 완료 시 다음을 사용자에게 명시:
 7. **HF transformers의 forward를 monkey-patch하지 말 것** (modeling 파일 fork)
 8. **paper-headline을 위해 데이터를 굽지 말 것** (negative result도 그대로 보고)
 9. **MacBook에서 GPU 의존 실험 시도하지 말 것** (모든 forward는 ssh vast로)
-10. **SSH 명령 인라인에 시크릿(HF_TOKEN 등) 박지 말 것** (vast.ai .env에서만)
-11. **vast.ai 인스턴스가 죽었을 때 자동 spawn 시도하지 말 것** (사용자에게 요청)
-12. **vast.ai API로 인스턴스 destroy/stop 시도하지 말 것** (사용자 권한)
+10. **시크릿(HF_TOKEN, VAST_API_KEY 등)을 SSH 명령 인라인·stdout·log에 노출하지 말 것** (vast.ai .env에서만 source)
+
+(이전 11·12 — 인스턴스 자동 spawn/destroy 금지 — 는 2026-05-14 v5에서 정책 전환으로 삭제됨. DECISIONS.md §8.4 참조)
 
 ---
 
