@@ -533,3 +533,7 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - CLAUDE.md §3.1/§3.2/§3.3/§4/§4.3/§11 동기 수정 (DECISIONS.md §8 참조 형태, 규칙 본문은 복사 ❌)
   - patches/lmcache-vllm-cacheblend: LMCache README가 unified diff가 아닌 수동 삽입 코드블록이라 `.md`로 저장 (`.patch` ❌). 관련 경로 참조 수정
   - 정직성 기록: LMCache README 1차 회수에 쓴 WebFetch가 원문에 없는 소제목을 임의 추가 → `gh api`+`curl` raw 교차검증으로 바로잡음
+- **2026-05-14 v6**: 세션 종료 표준 요약문 양식 신설 (사용자 결정)
+  - CLAUDE.md §5.4 신설: "매 세션 종료 시 표준 요약문" — 세션 종료 신호 시점에 핸드오프용 plain-text 요약을 마지막 응답에 출력
+  - 청자는 다음 세션의 Claude, 용도는 (a) 현재 상태 파악 (b) 다음 세션 진입 프롬프트 생성
+  - 양식 8개 섹션 (세션 범위 / 완료된 작업 / 미완·보류 / 다음 세션 진입점 / 의사결정 대기 / 정직성 노트 / vast.ai 사용 / 변경된 핵심 파일), brief 보고와 별개로 출력, diff·긴 인용·표 ❌, 사실만
