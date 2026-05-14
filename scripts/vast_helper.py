@@ -29,12 +29,17 @@ from pathlib import Path
 
 # --- 상수 (CLAUDE.md §6.3 — magic number 금지) ---
 REPO_URL = "https://github.com/chjs/compblend3.git"  # public repo — clone 인증 불필요
-GPU_SEARCH_QUERY = "gpu_name=A100_SXM4 gpu_ram>=80 num_gpus=1 rentable=true"
-# base image: vast.ai PyTorch 계열. 잠정값 — 첫 할당 시 가용성 확인 후 고정.
+# disk_space 필터 필수 — 없으면 disk 작은 offer가 잡혀 `--disk` 요청이 12GB로 fallback됨
+# (2026-05-15 첫 할당 실패 원인). disk_space는 offer 호스트의 가용 디스크(GB).
+GPU_SEARCH_QUERY = (
+    "gpu_name=A100_SXM4 gpu_ram>=80 num_gpus=1 disk_space>=100 rentable=true"
+)
+# base image: vast.ai PyTorch 계열. 잠정값 — 가용성 확인 후 고정.
 # install_vastai.sh가 torch 2.10.0+cu128을 자체 설치하므로 base의 torch 버전은 무관,
 # CUDA 12.x + Python만 있으면 됨.
 INSTANCE_IMAGE = "pytorch/pytorch:2.4.1-cuda12.4-cudnn9-devel"
-INSTANCE_DISK_GB = 200
+INSTANCE_DISK_GB = 100           # Mistral-7B 작업에 충분 (모델 ~15GB + torch/cuda + 캐시)
+MIN_DISK_AVAIL_GB = 40           # setup 전 `/` 가용 공간 가드 — 미달 시 install 중단
 POLL_INTERVAL_S = 10
 POLL_TIMEOUT_S = 600
 
@@ -222,6 +227,17 @@ def setup_instance(ssh_host: str, ssh_port: int) -> None:
        전송 (시크릿 값이 argv/로그에 남지 않게).
     """
     ssh_base = _ssh_base(ssh_host, ssh_port)
+
+    # 디스크 가드 — 직전 실패(12GB overlay에 No space left) 재발 방지.
+    # 긴 install_vastai.sh 실행 전에 `/` 가용 공간을 확인한다.
+    res = _run(ssh_base + ["df -BG --output=avail / | tail -1"])
+    avail_gb = int(res.stdout.strip().rstrip("G"))
+    if avail_gb < MIN_DISK_AVAIL_GB:
+        raise RuntimeError(
+            f"인스턴스 `/` 가용 공간 {avail_gb}GB < {MIN_DISK_AVAIL_GB}GB — "
+            "install 중단. 인스턴스 destroy 후 disk_space 큰 offer로 재할당 필요."
+        )
+    print(f"[setup] 디스크 가드 통과 — `/` 가용 {avail_gb}GB")
 
     print("[setup] git clone")
     _run(ssh_base + [f"test -d compblend3 || git clone {REPO_URL}"])
