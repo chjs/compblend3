@@ -1,0 +1,66 @@
+{
+  "env_tag": "vastai",
+  "all_ok": true,
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "release": "5.4.0-42-generic"
+  },
+  "checks": [
+    {
+      "name": "Python",
+      "value": "3.10.12",
+      "status": "OK",
+      "expected": "3.10.x"
+    },
+    {
+      "name": "PyTorch",
+      "value": "2.10.0+cu128",
+      "status": "OK",
+      "expected": "2.10.0+cu128"
+    },
+    {
+      "name": "CUDA (from torch)",
+      "value": "12.8",
+      "status": "OK",
+      "expected": "12.x"
+    },
+    {
+      "name": "GPU",
+      "value": "NVIDIA A100-SXM4-80GB (79GB)",
+      "status": "OK",
+      "expected": "A100 80GB"
+    },
+    {
+      "name": "Deterministic mode",
+      "value": "available",
+      "status": "OK",
+      "expected": ""
+    },
+    {
+      "name": "Transformers",
+      "value": "4.51.3",
+      "status": "OK",
+      "expected": ">=4.50"
+    },
+    {
+      "name": "HF_TOKEN",
+      "value": "set",
+      "status": "OK",
+      "expected": ""
+    },
+    {
+      "name": "Environment tag",
+      "value": "vastai",
+      "status": "OK",
+      "expected": ""
+    },
+    {
+      "name": "nvidia-smi",
+      "value": "525.125.06, NVIDIA A100-SXM4-80GB",
+      "status": "OK",
+      "expected": ""
+    }
+  ],
+  "timestamp": "2026-05-14T17:12:53+00:00"
+}
