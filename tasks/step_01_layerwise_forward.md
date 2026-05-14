@@ -17,7 +17,7 @@ HF transformers 4.51.3의 `modeling_mistral.py`를 `src/compblend/modeling/`로 
 
 ## Step 1 원칙 (반드시 지킬 것)
 
-- **Step 1 원칙: `src/compblend/modeling/` 안의 코드는 HF에서 fork한 그대로 — 수정 ❌. 검증 계측은 외부 forward hook으로만.**
+- **Step 1 원칙: `src/compblend/modeling/` 안의 코드는 import 문 외 byte 무수정. import은 상대→절대 경로 변환만 허용, 추가/제거 ❌. 검증 계측은 외부 forward hook으로만.**
 - **invariant 1.3은 RoPE 전 q/k/v 기준. RoPE 후 검증은 이후 step에서 필요 시 추가.**
 
 ## 사전 조건
@@ -59,11 +59,13 @@ RoPE 후 q/k는 검증하지 않는다 — 무수정 fork이므로 invariant 1.2
 ### fork
 
 - **소스**: 설치된 transformers 4.51.3의 `transformers/models/mistral/modeling_mistral.py` (1101줄).
-- **대상**: `src/compblend/modeling/modeling_mistral.py` — 원본을 **바이트 그대로 복사**.
-  - 파일 상단에 출처 주석 1줄만 추가 허용: `# forked from transformers==4.51.3 transformers/models/mistral/modeling_mistral.py — 무수정`. 그 외 본문 로직은 한 줄도 바꾸지 않는다.
-  - 이 파일이 `from transformers...`로 import하는 내부 모듈(base 클래스, RoPE 헬퍼 등)은 그대로 transformers 설치본을 사용한다 — fork 대상 ❌. fork = "modeling_mistral.py 단일 파일이 우리 소유"라는 뜻이지 transformers 전체 재구현이 아니다.
-  - 구현 시 실제 4.51.3 파일을 먼저 확인 — import 구조에 따라 복사 범위 미세 조정 가능하나, **modeling_mistral.py 본문 로직은 무수정**.
-- `src/compblend/modeling/__init__.py` — `MistralForCausalLM` (및 필요 시 `MistralModel`) export.
+- **대상**: `src/compblend/modeling/modeling_mistral.py` — **import 문 외 byte 무수정. import은 상대→절대 경로 변환만 허용, 추가/제거 ❌.**
+  - transformers 원본은 전부 상대 import(`from ...activations` 등 11개 + `from .configuration_mistral` 1개 = 12개)를 쓴다. `src/compblend/modeling/`에서는 상대 import가 깨지므로 이 12줄만 절대 경로로 변환한다 (`from ...X` → `from transformers.X`, `from .configuration_mistral` → `from transformers.models.mistral.configuration_mistral`). 본문 1089줄은 byte 무수정.
+  - 파일 상단에 출처 주석 1줄만 추가 허용.
+  - import 변환 후 transformers 설치본의 내부 모듈(base 클래스, RoPE 헬퍼, config 등)을 그대로 사용한다 — fork 대상 ❌. fork = "modeling_mistral.py 단일 파일이 우리 소유"라는 뜻이지 transformers 전체 재구현이 아니다.
+  - 변환 검증: 변환 후 원본과 `diff` → 정확히 12줄(import만) 차이임을 확인하고 `FORK_HASH.txt`에 source sha256 + 12줄 before/after를 기록한다 (invariant 실패 시 진단 1단계용).
+- `src/compblend/modeling/__init__.py` — `MistralForCausalLM`, `MistralModel` export.
+- `src/compblend/modeling/FORK_HASH.txt` — source sha256 + fork sha256 + 변환된 import 12줄 기록.
 - assert/hook/dump를 fork 디렉토리 안에 추가 ❌ (그건 Step 4+).
 
 ### 호출 방식 ("our forward" vs "HF 표준")
@@ -85,9 +87,10 @@ RoPE 후 q/k는 검증하지 않는다 — 무수정 fork이므로 invariant 1.2
 
 | 파일 | 내용 |
 |---|---|
-| `src/compblend/modeling/__init__.py` | `MistralForCausalLM` export |
-| `src/compblend/modeling/modeling_mistral.py` | transformers 4.51.3 `modeling_mistral.py` 무수정 fork |
-| `tasks/step_01/run_layerwise_check.py` | 검증 스크립트 (seed 고정, deterministic, 두 모델 로드, invariant 1.1/1.2/1.3 검증, summary.json 작성) |
+| `src/compblend/modeling/__init__.py` | `MistralForCausalLM`, `MistralModel` export |
+| `src/compblend/modeling/modeling_mistral.py` | transformers 4.51.3 `modeling_mistral.py` fork (import 12줄 상대→절대, 본문 무수정) |
+| `src/compblend/modeling/FORK_HASH.txt` | source sha256 + fork sha256 + 변환된 import 12줄 기록 |
+| `tasks/step_01/run_layerwise_check.py` | 검증 스크립트 (순차 로드, forward hook, invariant 1.1/1.2/1.3 검증, summary.json 작성) |
 
 `src/compblend/__init__.py`는 이미 존재. 디렉토리는 `mkdir -p src/compblend/modeling tasks/step_01`.
 
