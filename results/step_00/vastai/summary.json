@@ -1,0 +1,141 @@
+{
+  "step": 0,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "torch_dtype": "float32",
+  "attention_implementation": "eager",
+  "seed": 42,
+  "n_runs": 3,
+  "invariants": {
+    "0.1_same_input_deterministic": {
+      "passed": true,
+      "description": "같은 입력 + 같은 seed 3회 → logits SHA-256 동일"
+    },
+    "0.2_different_input_distinguishable": {
+      "passed": true,
+      "description": "다른 입력 → logits SHA-256 다름"
+    }
+  },
+  "all_invariants_passed": true,
+  "logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+  "logits_summary": {
+    "shape": [
+      1,
+      6,
+      32000
+    ],
+    "max": 15.166627883911133,
+    "min": -22.24207878112793,
+    "mean": -3.0109283924102783,
+    "norm": 1751.8658447265625,
+    "last_token_top5_values": [
+      14.03335189819336,
+      13.096352577209473,
+      12.640398979187012,
+      12.377325057983398,
+      11.973189353942871
+    ],
+    "last_token_top5_indices": [
+      5465,
+      264,
+      624,
+      2651,
+      272
+    ]
+  },
+  "last_token_top1_decoded": "Paris",
+  "details": {
+    "prompt_A": "The capital of France is",
+    "prompt_B": "Photosynthesis is the process by which",
+    "runs_A": [
+      {
+        "run": 1,
+        "sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+        "summary": {
+          "shape": [
+            1,
+            6,
+            32000
+          ],
+          "max": 15.166627883911133,
+          "min": -22.24207878112793,
+          "mean": -3.0109283924102783,
+          "norm": 1751.8658447265625,
+          "last_token_top5_values": [
+            14.03335189819336,
+            13.096352577209473,
+            12.640398979187012,
+            12.377325057983398,
+            11.973189353942871
+          ],
+          "last_token_top5_indices": [
+            5465,
+            264,
+            624,
+            2651,
+            272
+          ]
+        }
+      },
+      {
+        "run": 2,
+        "sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+        "summary": {
+          "shape": [
+            1,
+            6,
+            32000
+          ],
+          "max": 15.166627883911133,
+          "min": -22.24207878112793,
+          "mean": -3.0109283924102783,
+          "norm": 1751.8658447265625,
+          "last_token_top5_values": [
+            14.03335189819336,
+            13.096352577209473,
+            12.640398979187012,
+            12.377325057983398,
+            11.973189353942871
+          ],
+          "last_token_top5_indices": [
+            5465,
+            264,
+            624,
+            2651,
+            272
+          ]
+        }
+      },
+      {
+        "run": 3,
+        "sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+        "summary": {
+          "shape": [
+            1,
+            6,
+            32000
+          ],
+          "max": 15.166627883911133,
+          "min": -22.24207878112793,
+          "mean": -3.0109283924102783,
+          "norm": 1751.8658447265625,
+          "last_token_top5_values": [
+            14.03335189819336,
+            13.096352577209473,
+            12.640398979187012,
+            12.377325057983398,
+            11.973189353942871
+          ],
+          "last_token_top5_indices": [
+            5465,
+            264,
+            624,
+            2651,
+            272
+          ]
+        }
+      }
+    ],
+    "prompt_B_sha256": "7cc4f432e2418b2a3410a1e51ab5fe09a60c22112ae964b24a085a442f70ba4d"
+  }
+}
