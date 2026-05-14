@@ -432,9 +432,9 @@ git add + commit + push
 - F1이 안 나오면 어디서 안 나오는지 추적 가능한 구조 유지
 
 ### 9.6 Git workflow
-- `main` 브랜치는 항상 검증 통과한 상태만 유지
-- 각 step은 `step/step_XX_<short-desc>` 브랜치에서 진행
-- Step 완료 → PR/merge → tag `step_XX_done`
+- `main` 브랜치는 항상 검증 통과한 상태만 유지. Step 작업 중 `main` 직접 commit ❌ — 예외: (a) 정책/규칙 변경(CLAUDE.md·DECISIONS.md·PROGRESS.md 등 메타 문서), (b) Phase 단위 작업(step 번호 없는 환경 셋업).
+- 각 step은 `step/step_XX_<short-desc>` 브랜치에서 진행. Sub-step도 같은 step 브랜치에 commit 누적, 별도 브랜치 ❌.
+- Step 완료 + 사용자 리뷰 승인 후: 로컬 `git merge --no-ff` 로 `main`에 병합 (merge commit 유지 — git log에 step 단위 그룹 가시화) → tag `step_XX_done` → `git push origin main step_XX_done` → step 브랜치 삭제(로컬+원격). **PR 생성 ❌** (솔로 프로젝트, 로컬 merge + push).
 - Commit 메시지: `[step_XX] <description>` 형태
 - Claude Code는 commit까지 자동, push는 사용자 승인 시
 
@@ -543,3 +543,8 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - repo 전역 `docs/reports/*.html` 참조 17곳 → `.md`. history/log 3곳(§13 v2 이력, docs/prompts/phase_00_prompt.md 2곳)은 append-only 원칙상 의도적 유지
   - 기존 docs/reports/phase_00_setup_report.html은 변환하지 않고 그대로 둠 (one-off legacy, 시간 비효율)
   - 검토 채널: GitHub에서 직접 (이메일 ❌)
+- **2026-05-15 v8**: 브랜치 워크플로우 명확화 (Step 0 진입 시점)
+  - §9.6 / CLAUDE.md §7.1: "PR/merge" → 로컬 `git merge --no-ff` (PR 생성 ❌), tag + `git push origin main step_XX_done` + step 브랜치 삭제(로컬+원격) 단계 명시
+  - main 직접 commit ❌ 규칙 + 예외 (a) 정책/규칙 변경(메타 문서) (b) Phase 단위 작업, sub-step은 같은 step 브랜치 누적
+  - CLAUDE.md §7.2에 `[meta]` commit prefix 정의 (정책/메타 문서·Phase 단위 작업용)
+  - Phase 0가 main에 직접 들어간 것은 정책 누락이었으나 이미 반영됨 — revert ❌, Step 0부터 적용

@@ -294,7 +294,16 @@ torch.backends.cudnn.benchmark = False
 ### 7.1 브랜치
 - `main`: 검증 통과한 상태만
 - `step/step_XX_<short-desc>`: 각 step 작업 브랜치
-- Step 완료 → main에 merge → tag `step_XX_done`
+- Step 완료 + 사용자 리뷰 승인 후:
+  1. `git checkout main && git merge --no-ff step/step_XX_<desc>`
+  2. `git tag step_XX_done`
+  3. `git push origin main step_XX_done`
+  4. step 브랜치 삭제 (로컬 + 원격)
+  PR 생성 ❌ (솔로 프로젝트, 로컬 merge + push).
+- Step 작업 중 `main` 직접 commit ❌. 단 예외:
+  (a) 정책/규칙 변경 (CLAUDE.md·DECISIONS.md·PROGRESS.md 등 메타 문서)
+  (b) Phase 단위 작업 (step 번호 없는 환경 셋업)
+- Sub-step도 같은 step 브랜치에 commit 누적, 별도 브랜치 ❌.
 
 ### 7.2 Commit 메시지
 ```
@@ -306,6 +315,8 @@ torch.backends.cudnn.benchmark = False
 invariant: <어떤 invariant 통과했는지>
 results: results/step_XX/vastai/summary.json
 ```
+
+정책/메타 문서 변경(§7.1 예외 (a))·Phase 단위 작업은 `[meta]` prefix 사용 — `invariant`/`results` 줄 생략.
 
 ### 7.3 자동/수동
 - Claude Code는 commit까지 자동
