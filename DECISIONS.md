@@ -432,7 +432,7 @@ git add + commit + push
 - F1이 안 나오면 어디서 안 나오는지 추적 가능한 구조 유지
 
 ### 9.6 Git workflow
-- `main` 브랜치는 항상 검증 통과한 상태만 유지. Step 작업 중 `main` 직접 commit ❌ — 예외: (a) 정책/규칙 변경(CLAUDE.md·DECISIONS.md·PROGRESS.md 등 메타 문서), (b) Phase 단위 작업(step 번호 없는 환경 셋업).
+- `main` 브랜치는 항상 검증 통과한 상태만 유지. Step 작업 중 `main` 직접 commit ❌ — 예외: (a) 정책/규칙 변경 또는 step 진입 전 task 파일 신설·확장(CLAUDE.md·DECISIONS.md·PROGRESS.md·tasks/*.md 등 메타·스펙 문서), (b) Phase 단위 작업(step 번호 없는 환경 셋업).
 - 각 step은 `step/step_XX_<short-desc>` 브랜치에서 진행. Sub-step도 같은 step 브랜치에 commit 누적, 별도 브랜치 ❌.
 - Step 완료 + 사용자 리뷰 승인 후: 로컬 `git merge --no-ff` 로 `main`에 병합 (merge commit 유지 — git log에 step 단위 그룹 가시화) → tag `step_XX_done` → `git push origin main step_XX_done` → step 브랜치 삭제(로컬+원격). **PR 생성 ❌** (솔로 프로젝트, 로컬 merge + push).
 - Commit 메시지: `[step_XX] <description>` 형태
@@ -548,3 +548,6 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - main 직접 commit ❌ 규칙 + 예외 (a) 정책/규칙 변경(메타 문서) (b) Phase 단위 작업, sub-step은 같은 step 브랜치 누적
   - CLAUDE.md §7.2에 `[meta]` commit prefix 정의 (정책/메타 문서·Phase 단위 작업용)
   - Phase 0가 main에 직접 들어간 것은 정책 누락이었으나 이미 반영됨 — revert ❌, Step 0부터 적용
+- **2026-05-15 v9**: §7.1/§9.6 main 직접 commit 예외 (a)에 "step 진입 전 task 파일 신설·확장" 명시
+  - Step 1 stub → 자체완결 task 파일 확장을 main에 `[meta]` commit하기 위함 — task 파일은 step 브랜치 분기 전에 확장되므로 step 브랜치에 둘 수 없음
+  - 기존 예외 (a)는 "정책/규칙 변경 (CLAUDE.md·DECISIONS.md·PROGRESS.md 등)"만 명시 → task 파일 미포함이라 한 줄 보강. CLAUDE.md §7.1 / DECISIONS.md §9.6 동기 수정

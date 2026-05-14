@@ -301,7 +301,7 @@ torch.backends.cudnn.benchmark = False
   4. step 브랜치 삭제 (로컬 + 원격)
   PR 생성 ❌ (솔로 프로젝트, 로컬 merge + push).
 - Step 작업 중 `main` 직접 commit ❌. 단 예외:
-  (a) 정책/규칙 변경 (CLAUDE.md·DECISIONS.md·PROGRESS.md 등 메타 문서)
+  (a) 정책/규칙 변경, 또는 step 진입 전 task 파일 신설·확장 (CLAUDE.md·DECISIONS.md·PROGRESS.md·tasks/*.md 등 메타·스펙 문서)
   (b) Phase 단위 작업 (step 번호 없는 환경 셋업)
 - Sub-step도 같은 step 브랜치에 commit 누적, 별도 브랜치 ❌.
 
