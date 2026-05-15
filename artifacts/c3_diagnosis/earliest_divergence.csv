@@ -1,0 +1,99 @@
+layer,tensor_name,max_abs_diff,mean_abs_diff,argmax_idx,earliest_nonzero
+0,hidden_state,0.000000e+00,0,"[0, 0]",no
+1,hidden_state,1.862645e-08,1.938218e-09,"[0, 2245]",no
+2,hidden_state,2.235174e-08,2.930745e-09,"[0, 155]",no
+3,hidden_state,4.563481e-08,5.195059e-09,"[0, 1697]",no
+4,hidden_state,5.029142e-08,7.012609e-09,"[0, 1697]",no
+5,hidden_state,5.960464e-08,9.568964e-09,"[0, 267]",no
+6,hidden_state,7.450581e-08,1.147038e-08,"[0, 267]",no
+7,hidden_state,7.450581e-08,1.471693e-08,"[0, 267]",no
+8,hidden_state,1.043081e-07,1.826537e-08,"[0, 2960]",yes
+9,hidden_state,1.043081e-07,2.197578e-08,"[0, 2824]",yes
+10,hidden_state,1.415610e-07,2.499132e-08,"[0, 2824]",yes
+11,hidden_state,1.490116e-07,2.811646e-08,"[0, 3662]",yes
+12,hidden_state,1.788139e-07,3.086717e-08,"[0, 3662]",yes
+13,hidden_state,1.937151e-07,3.462347e-08,"[0, 2692]",yes
+14,hidden_state,3.576279e-07,3.713910e-08,"[0, 2070]",yes
+15,hidden_state,9.536743e-07,3.994185e-08,"[0, 2070]",yes
+16,hidden_state,1.311302e-06,4.419311e-08,"[0, 2070]",yes
+17,hidden_state,9.536743e-07,4.765846e-08,"[0, 2070]",yes
+18,hidden_state,1.192093e-06,5.936831e-08,"[0, 2070]",yes
+19,hidden_state,7.152557e-07,6.917264e-08,"[0, 3901]",yes
+20,hidden_state,1.430511e-06,8.258735e-08,"[0, 3901]",yes
+21,hidden_state,1.430511e-06,9.024916e-08,"[0, 3901]",yes
+22,hidden_state,1.907349e-06,9.641235e-08,"[0, 3901]",yes
+23,hidden_state,1.668930e-06,1.031121e-07,"[0, 3901]",yes
+24,hidden_state,2.384186e-06,1.127458e-07,"[0, 3901]",yes
+25,hidden_state,2.861023e-06,1.221550e-07,"[0, 3901]",yes
+26,hidden_state,2.861023e-06,1.322697e-07,"[0, 3901]",yes
+27,hidden_state,2.861023e-06,1.430201e-07,"[0, 3901]",yes
+28,hidden_state,2.861023e-06,1.583358e-07,"[0, 3901]",yes
+29,hidden_state,3.814697e-06,1.760453e-07,"[0, 3901]",yes
+30,hidden_state,5.722046e-06,2.018796e-07,"[0, 3901]",yes
+31,hidden_state,7.629395e-06,2.259767e-07,"[0, 3901]",yes
+32,hidden_state,3.242493e-05,3.011627e-06,"[0, 552]",yes
+-1,logits,6.198883e-06,1.039425e-06,"[0, 21430]",yes
+0,prefix_K_vs_full_slice,0.000000e+00,0,,no
+0,prefix_V_vs_full_slice,0.000000e+00,0,,no
+1,prefix_K_vs_full_slice,1.907349e-06,9.998914e-08,,yes
+1,prefix_V_vs_full_slice,8.940697e-08,1.111299e-08,,no
+2,prefix_K_vs_full_slice,2.384186e-06,1.670625e-07,,yes
+2,prefix_V_vs_full_slice,3.576279e-07,4.091980e-08,,yes
+3,prefix_K_vs_full_slice,1.430511e-06,1.633822e-07,,yes
+3,prefix_V_vs_full_slice,3.650784e-07,4.563099e-08,,yes
+4,prefix_K_vs_full_slice,1.907349e-06,2.031579e-07,,yes
+4,prefix_V_vs_full_slice,4.768372e-07,6.888435e-08,,yes
+5,prefix_K_vs_full_slice,2.861023e-06,2.392342e-07,,yes
+5,prefix_V_vs_full_slice,5.960464e-07,8.078907e-08,,yes
+6,prefix_K_vs_full_slice,1.907349e-06,2.327624e-07,,yes
+6,prefix_V_vs_full_slice,5.066395e-07,7.836674e-08,,yes
+7,prefix_K_vs_full_slice,2.861023e-06,2.585433e-07,,yes
+7,prefix_V_vs_full_slice,6.705523e-07,8.997379e-08,,yes
+8,prefix_K_vs_full_slice,2.861023e-06,2.649946e-07,,yes
+8,prefix_V_vs_full_slice,9.536743e-07,1.040955e-07,,yes
+9,prefix_K_vs_full_slice,4.291534e-06,3.142908e-07,,yes
+9,prefix_V_vs_full_slice,8.046627e-07,1.163240e-07,,yes
+10,prefix_K_vs_full_slice,2.861023e-06,3.123613e-07,,yes
+10,prefix_V_vs_full_slice,9.462237e-07,1.140480e-07,,yes
+11,prefix_K_vs_full_slice,4.053116e-06,3.223983e-07,,yes
+11,prefix_V_vs_full_slice,1.117587e-06,1.393494e-07,,yes
+12,prefix_K_vs_full_slice,8.583069e-06,3.565736e-07,,yes
+12,prefix_V_vs_full_slice,1.054257e-06,1.405797e-07,,yes
+13,prefix_K_vs_full_slice,3.337860e-06,3.443223e-07,,yes
+13,prefix_V_vs_full_slice,1.251698e-06,1.521274e-07,,yes
+14,prefix_K_vs_full_slice,3.933907e-06,3.159408e-07,,yes
+14,prefix_V_vs_full_slice,1.609325e-06,1.800722e-07,,yes
+15,prefix_K_vs_full_slice,3.337860e-06,3.470447e-07,,yes
+15,prefix_V_vs_full_slice,1.370907e-06,1.797005e-07,,yes
+16,prefix_K_vs_full_slice,2.980232e-06,3.583470e-07,,yes
+16,prefix_V_vs_full_slice,1.341105e-06,1.763767e-07,,yes
+17,prefix_K_vs_full_slice,3.337860e-06,3.046951e-07,,yes
+17,prefix_V_vs_full_slice,1.251698e-06,1.627175e-07,,yes
+18,prefix_K_vs_full_slice,3.099442e-06,3.152939e-07,,yes
+18,prefix_V_vs_full_slice,1.236796e-06,1.692502e-07,,yes
+19,prefix_K_vs_full_slice,2.861023e-06,3.213428e-07,,yes
+19,prefix_V_vs_full_slice,1.296401e-06,1.898565e-07,,yes
+20,prefix_K_vs_full_slice,2.741814e-06,3.133876e-07,,yes
+20,prefix_V_vs_full_slice,1.251698e-06,1.844181e-07,,yes
+21,prefix_K_vs_full_slice,3.576279e-06,3.070597e-07,,yes
+21,prefix_V_vs_full_slice,1.251698e-06,1.925150e-07,,yes
+22,prefix_K_vs_full_slice,2.503395e-06,3.059018e-07,,yes
+22,prefix_V_vs_full_slice,1.370907e-06,2.065371e-07,,yes
+23,prefix_K_vs_full_slice,2.861023e-06,3.118590e-07,,yes
+23,prefix_V_vs_full_slice,1.579523e-06,2.130192e-07,,yes
+24,prefix_K_vs_full_slice,2.622604e-06,3.294235e-07,,yes
+24,prefix_V_vs_full_slice,1.788139e-06,2.216297e-07,,yes
+25,prefix_K_vs_full_slice,2.861023e-06,3.228916e-07,,yes
+25,prefix_V_vs_full_slice,1.639128e-06,2.360857e-07,,yes
+26,prefix_K_vs_full_slice,2.861023e-06,3.057699e-07,,yes
+26,prefix_V_vs_full_slice,1.713634e-06,2.472336e-07,,yes
+27,prefix_K_vs_full_slice,2.861023e-06,3.229732e-07,,yes
+27,prefix_V_vs_full_slice,1.728535e-06,2.467731e-07,,yes
+28,prefix_K_vs_full_slice,2.384186e-06,3.094588e-07,,yes
+28,prefix_V_vs_full_slice,1.907349e-06,2.789436e-07,,yes
+29,prefix_K_vs_full_slice,2.861023e-06,3.153073e-07,,yes
+29,prefix_V_vs_full_slice,2.682209e-06,3.427066e-07,,yes
+30,prefix_K_vs_full_slice,2.384186e-06,2.926068e-07,,yes
+30,prefix_V_vs_full_slice,2.697110e-06,3.400065e-07,,yes
+31,prefix_K_vs_full_slice,2.384186e-06,2.845486e-07,,yes
+31,prefix_V_vs_full_slice,2.622604e-06,3.562065e-07,,yes
