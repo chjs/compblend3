@@ -563,4 +563,9 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - (d) CLAUDE.md §4.5 신설(권장): task 파일 확장 시 외부 코드 의존 가정의 사전 확인 (Step 1 fork 단일 파일 import 가정 실패 사례에서 도출).
   - (e) CLAUDE.md §4.5 (같은 §): round 중간 결정 변경 시 초반 기록 재검토 (Step 1 명명 정정 round의 JSON key 보존 목록 부정확 사례에서 도출).
   - 분리: (a) `scripts/vast_helper.py` push `-u` 가드는 §7.2 `[meta]` 정의(코드는 메타·스펙 문서 아님)에 부합 안 함 — Step 2 step 브랜치 첫 commit으로 처리. (b) dph_total 불일치 추적은 다음 vast.ai 실행 시 데이터 추가 수집 후. (f) `[meta]` prefix 정의·분류 검토는 명명 round로 분리.
+- **2026-05-15 v12**: Step 2 task 파일 stub → 자체완결 확장
+  - 외부 코드 의존 가정 사전 확인 (CLAUDE.md §4.5 (d) 첫 적용): DynamicCache는 `transformers.cache_utils`의 공개 API(4.51.3), MistralModel.forward는 `past_key_values: Optional[Cache]`만 허용 — **legacy Tuple of Tensors 지원은 이미 제거** (fork line 489-490이 `isinstance` 검사로 거부, 주석 "TODO: remove in v4.56"). Step 2 비교 surface는 "DynamicCache(use_cache=True) vs None(use_cache=False)" 명확.
+  - Invariant 정의: 2.1 (logits SHA-256), 2.2 (layer hidden state SHA-256, 33개), 2.3A (split forward = single forward, **bitwise 1차 → atol 1e-6 fallback → 실패 시 사용자 보고**). fp32/eager/deterministic에서도 bitwise 보장 단정 ❌ — split path의 K/V concat 경로 차이 가능성 명시.
+  - prompt `"The capital of France is"` (Step 0/1과 동일), decode = greedy argmax(`logits[:, -1, :]`) — Step 0에서 5465="Paris" 확인됨. seed=42 각 forward 직전 `set_all_seeds`.
+  - fork(`src/compblend/modeling/`) 무수정 유지 원칙은 Step 1과 동일. 검증 계측은 외부 hook·dict 캡처만, fork 디렉토리에 추가 ❌.
   - step 브랜치 마지막 commit으로 처리(`[meta]` prefix) — Step 1 파일 대부분이 미merge 상태라 main 직접 작업 불가, Step 1 merge 시 정정된 이름으로 main 반영.
