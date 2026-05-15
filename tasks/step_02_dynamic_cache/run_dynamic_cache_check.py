@@ -78,7 +78,7 @@ def main() -> None:
     # (a) no-cache forward — 2.1·2.2의 reference (use_cache=False)
     print("[2/5] no-cache forward (use_cache=False, output_hidden_states=True)")
     set_all_seeds(SEED)
-    with torch.no_grad():
+    with torch.inference_mode():
         out_nocache = model(**ids, use_cache=False, output_hidden_states=True)
     # logits: (1, T_prompt, vocab), hidden_states: 33 × (1, T_prompt, H)
     nocache_logits = out_nocache.logits.detach().to("cpu", torch.float32)
@@ -88,7 +88,7 @@ def main() -> None:
     # (b) cache forward — 2.1·2.2의 변형 path (use_cache=True, DynamicCache 자동 생성)
     print("[3/5] cache forward (use_cache=True, output_hidden_states=True)")
     set_all_seeds(SEED)
-    with torch.no_grad():
+    with torch.inference_mode():
         out_cache = model(**ids, use_cache=True, output_hidden_states=True)
     # out_cache.past_key_values: DynamicCache 인스턴스 (자동 생성)
     cache_logits = out_cache.logits.detach().to("cpu", torch.float32)
@@ -103,16 +103,24 @@ def main() -> None:
     # 비교가 목적이고, 중간 재seed는 single path와 어긋남.
     print("[4/5] split path: prefill + decode (seed 1회, prefill→decode 사이 재seed ❌)")
     set_all_seeds(SEED)
-    with torch.no_grad():
+    with torch.inference_mode():
         out_prefill = model(**ids, use_cache=True)
         # next_token_id: (1, 1) — greedy argmax of last-token logits
         next_token_id = out_prefill.logits[:, -1, :].argmax(dim=-1, keepdim=True)
-        # decode 단계: attention_mask 미전달 → HF가 cache_position 기반으로 추론.
+        # decode 단계: attention_mask·cache_position 명시 전달 (HF 자동 추론 의존 제거 —
+        # ChatGPT 외부 의견 반영, 2026-05-15 2.3A FAIL 진단 옵션 E).
         # past_key_values는 prefill의 DynamicCache 인스턴스 그대로 사용.
+        past_len = ids["input_ids"].shape[1]  # prefill 시 들어간 토큰 수 (= prompt length)
+        # attention_mask: (1, past_len + 1) — 캐시된 위치 + 새 토큰 위치 모두 attend
+        decode_attn_mask = torch.ones((1, past_len + 1), dtype=torch.long, device=next_token_id.device)
+        # cache_position: 새 토큰의 절대 위치 (cached 길이부터 새 토큰 1개)
+        decode_cache_position = torch.arange(past_len, past_len + 1, device=next_token_id.device)
         out_decode = model(
             input_ids=next_token_id,
             past_key_values=out_prefill.past_key_values,
             use_cache=True,
+            attention_mask=decode_attn_mask,
+            cache_position=decode_cache_position,
         )
     # split_logits: (1, vocab) — decode 단계의 last-token logits (decode 출력은 1 token)
     split_logits = out_decode.logits[:, -1, :].detach().to("cpu", torch.float32)
@@ -132,7 +140,7 @@ def main() -> None:
     }
     print(f"[5/5] single path: forward over {ids_full_input.shape[1]} tokens (use_cache=False)")
     set_all_seeds(SEED)
-    with torch.no_grad():
+    with torch.inference_mode():
         out_single = model(**ids_full, use_cache=False)
     # single_logits: (1, vocab) — last-token logits, split_logits와 비교 대상
     single_logits = out_single.logits[:, -1, :].detach().to("cpu", torch.float32)
