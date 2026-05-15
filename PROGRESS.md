@@ -8,7 +8,7 @@
 ## 현재 상태
 
 **Phase**: Phase 1 (Step 0~3) — Step 1 실험 통과, 사용자 리뷰 대기
-**완료**: Phase 0 전체 ✅ + Step 0 (결정론, tag `step_00_done`) ✅ + Step 1 (layerwise forward) invariant 1.1/1.2/1.3 통과 ✅
+**완료**: Phase 0 전체 ✅ + Step 0 (결정론, tag `step_00_done`) ✅ + Step 1 (fork 동치성 검증) invariant 1.1/1.2/1.3 통과 ✅
 **Next**: Step 1 사용자 리뷰 → 승인 시 `main`에 `--no-ff` merge + tag `step_01_done` + 브랜치 삭제 → Step 2 진입
 **Next task file**: `tasks/step_02_dynamic_cache.md` (현재 stub — 진입 전 확장 필요)
 **Branch**: `step/step_01_layerwise_forward` (리뷰 승인 후 merge·삭제)
@@ -38,7 +38,7 @@
 | Step | 목표 | 상태 | Report | 결과 |
 |---|---|---|---|---|
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
-| 1 | Our layerwise forward = HF 표준 (no cache) | 🔵 | step_01_layerwise_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
+| 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | 🔵 | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
 | 2 | HF DynamicCache forward = no-cache forward | ⬜ | - | - |
 | 3 | ChunkedKVStore 정확성 | ⬜ | - | - |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
@@ -109,7 +109,7 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 Step 1 실험 통과 (invariant 1.1/1.2/1.3 ✅), `step/step_01_layerwise_forward` 브랜치에 commit 완료. 남은 것:
 
-1. **사용자 리뷰** — `docs/reports/step_01_layerwise_report.md` 검토
+1. **사용자 리뷰** — `docs/reports/step_01_fork_equivalence_report.md` 검토
 2. 승인 시: `git checkout main && git merge --no-ff step/step_01_layerwise_forward` → `git tag step_01_done` → `git push origin main step_01_done` → step 브랜치 삭제(로컬+원격)
 3. Step 2 진입 — `tasks/step_02_dynamic_cache.md`는 현재 stub(30줄), 진입 전 자체완결 task 파일로 확장 필요
 
@@ -148,6 +148,7 @@ Step 1 실험 통과 (invariant 1.1/1.2/1.3 ✅), `step/step_01_layerwise_forwar
 - **2026-05-15 (Step 0 진행)**: `scripts/vast_helper.py` 구현(commit `009e1b6`). 첫 vast.ai 인스턴스 할당 시도 — id 36764141 (A100-SXM4 80GB, $0.641/h), 할당·`Host vast` alias·SSH·GPU(driver 570.172.08) 확인 OK. `install_vastai.sh`가 디스크 부족으로 실패(`/` overlay 12GB, torch 2.10+cu128 설치 중 No space left) → 안전 규칙대로 즉시 destroy. 원인 추정: offer의 disk 용량 부족 + `--disk 200` 미반영. 다음: `search offers`에 disk 용량 필터 추가 후 재시도.
 - **2026-05-15 (Step 0 완료)**: HF eager forward 결정론 검증 통과. vast.ai A100-SXM4-80GB(instance 36769033)에서 Mistral-7B-Instruct-v0.2 fp32/eager forward — invariant 0.1(같은 입력 3회 SHA-256 동일 `d338ec6a…`)·0.2(다른 입력 다른 SHA `7cc4f432…`) 모두 ✅. 결과 `results/step_00/vastai/summary.json`, 보고서 `docs/reports/step_00_determinism_report.md`. 셋업 중 인프라 이슈 2건 발견·수정: disk 작은 offer(→`disk_space>=100` 필터+가드 commit `e39dd54`), `vastai destroy` 대화형(→stdin "y"+검증 commit `239e53d`). 인스턴스 destroy 완료(잔존 0). local_a100 교차검증 미수행(별도 round). 사용자 리뷰 대기.
 - **2026-05-15 (Step 0 merge + `[meta]`)**: `step/step_00_determinism_check` → main `--no-ff` merge(`e801232`), tag `step_00_done`, 브랜치 삭제. `[meta]`: HF_HOME 빈 값 처리(`ef776fc`), Step 1 task 파일 확장 + §7.1/§9.6 예외 (a)에 task 파일 명시(`a5b34b1`, DECISIONS §13 v8·v9).
-- **2026-05-15 (Step 1 완료)**: Our layerwise forward = HF 표준 forward 검증 통과. transformers 4.51.3 `modeling_mistral.py`를 `src/compblend/modeling/`로 fork(import 12줄 상대→절대, 본문 1089줄 byte 무수정). vast.ai A100-SXM4-80GB(instance 36787683)에서 invariant 1.1(logits SHA-256)·1.2(hidden state 33개 SHA-256)·1.3(q/k/v projection 96개 torch.equal) 모두 ✅. logits SHA `d338ec6a…` — Step 0과 동일. 결과 `results/step_01/vastai/summary.json`, 보고서 `docs/reports/step_01_layerwise_report.md`. commit `4dcb1aa`(fork)·`494c13e`(검증 스크립트)·`b4f49da`(결과). 인스턴스 destroy 완료. 사용자 리뷰 대기.
+- **2026-05-15 (Step 1 완료)**: fork 동치성 검증 (fork된 코드 = HF 표준 forward) 통과. transformers 4.51.3 `modeling_mistral.py`를 `src/compblend/modeling/`로 fork(import 12줄 상대→절대, 본문 1089줄 byte 무수정). vast.ai A100-SXM4-80GB(instance 36787683)에서 invariant 1.1(logits SHA-256)·1.2(hidden state 33개 SHA-256)·1.3(q/k/v projection 96개 torch.equal) 모두 ✅. logits SHA `d338ec6a…` — Step 0과 동일. 결과 `results/step_01/vastai/summary.json`, 보고서 `docs/reports/step_01_fork_equivalence_report.md`. commit `4dcb1aa`(fork)·`494c13e`(검증 스크립트)·`b4f49da`(결과). 인스턴스 destroy 완료. 사용자 리뷰 대기.
+- **2026-05-15 (Step 1 명명 정정)**: `layerwise` → `fork_equivalence` rename. Step 1은 fork 무수정(import 외) 동치성 검증이고 layerwise forward 작성이 아님 — "layerwise"가 "layerwise forward 작성"으로 오독될 소지가 있어 Step 2 진입 전(정정 비용 최소 시점)에 정리. 진짜 layerwise forward는 Step 4(CacheBlend)에서 작성 예정. 파일/디렉토리 rename(git mv) + 내부 참조 정정. invariant 1.2 JSON key는 `1.2_layerwise_hidden_equiv`→`1.2_per_layer_hidden_equiv`로 정정(데이터 값 무변경). tag `step_01_done`·commit message history·summary.json 데이터 값·step 브랜치명은 보존. DECISIONS.md §13 v10.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)

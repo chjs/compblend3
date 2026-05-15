@@ -6,7 +6,7 @@
 
 - `phase_00_setup.md` — Phase 0 환경 셋업 (step 번호 없음)
 - `step_00_determinism_check.md` — Step 0
-- `step_01_layerwise_forward.md` — Step 1
+- `step_01_fork_equivalence.md` — Step 1
 - ...
 
 Sub-task 가 필요한 경우:
@@ -31,7 +31,7 @@ phase_00_setup.md     ← 현재 위치
    ↓
 step_00_determinism_check.md
    ↓
-step_01_layerwise_forward.md
+step_01_fork_equivalence.md
    ↓
 step_02_dynamic_cache.md
    ↓

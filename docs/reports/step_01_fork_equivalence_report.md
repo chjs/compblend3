@@ -1,4 +1,4 @@
-# Step 1 — Our layerwise forward = HF 표준 forward 보고서
+# Step 1 — fork 동치성 검증 보고서 (fork된 코드 = HF 표준 forward)
 
 ## 1. 요약
 
@@ -34,9 +34,9 @@ HF transformers 4.51.3의 `modeling_mistral.py`를 `src/compblend/modeling/`로 
 | `src/compblend/modeling/modeling_mistral.py` | 신규 (fork) | transformers 4.51.3 `modeling_mistral.py` — import 12줄 상대→절대, 본문 무수정 |
 | `src/compblend/modeling/__init__.py` | 신규 | `MistralForCausalLM`, `MistralModel` export |
 | `src/compblend/modeling/FORK_HASH.txt` | 신규 | source/fork sha256 + 변환된 import 12줄 기록 (진단 1단계용) |
-| `tasks/step_01/run_layerwise_check.py` | 신규 | invariant 1.1/1.2/1.3 검증 스크립트 |
+| `tasks/step_01_fork_equivalence/run_fork_equivalence_check.py` | 신규 | invariant 1.1/1.2/1.3 검증 스크립트 |
 | `results/step_01/vastai/summary.json` | 신규 | 검증 결과 (vast.ai에서 생성) |
-| `tasks/step_01_layerwise_forward.md` | 수정 | stub → 자체완결 spec 확장, §fork/"Step 1 원칙" import 변환 반영 |
+| `tasks/step_01_fork_equivalence.md` | 수정 | stub → 자체완결 spec 확장, §fork/"Step 1 원칙" import 변환 반영 |
 
 ## 5. Tensor shape 명세
 
@@ -54,7 +54,7 @@ Mistral-7B-Instruct-v0.2: `H=4096`, `H_q=32`, `H_kv=8`, `D=128` (DECISIONS.md §
 - **fork 방식**: transformers 원본은 전부 상대 import(`from ...activations` 등). `src/compblend/modeling/`에서 상대 import가 깨지므로 **import 12줄만 절대 경로로 변환**(`from ...X` → `from transformers.X`, `from .configuration_mistral` → `from transformers.models.mistral.configuration_mistral`). **forward 본문 1089줄은 byte 무수정** — `diff`로 정확히 12줄(import만) 차이 검증, `FORK_HASH.txt`에 source sha256 + 12줄 before/after 기록.
 - **호출 방식**: `compblend.modeling.MistralForCausalLM.from_pretrained` (our) vs `transformers.AutoModelForCausalLM.from_pretrained` (HF 표준) — 동일 weight·입력.
 - **순차 로드**: HF 로드 → forward → logits·hidden·q/k/v를 CPU 이동 → `del` + `empty_cache()` → our 로드 → forward → CPU 텐서끼리 비교. fp32×2=56GB 동시 적재 회피.
-- **검증 계측 (외부 forward hook, fork 코드 무수정)**: 각 layer의 `q_proj`/`k_proj`/`v_proj`에 `register_forward_hook` 96개(32 layer × 3) 등록 → 모듈 출력(RoPE 적용 전)을 즉시 CPU 캡처. hidden state는 `output_hidden_states=True`로 33개 추출. hook 코드는 `run_layerwise_check.py` 안에만.
+- **검증 계측 (외부 forward hook, fork 코드 무수정)**: 각 layer의 `q_proj`/`k_proj`/`v_proj`에 `register_forward_hook` 96개(32 layer × 3) 등록 → 모듈 출력(RoPE 적용 전)을 즉시 CPU 캡처. hidden state는 `output_hidden_states=True`로 33개 추출. hook 코드는 `run_fork_equivalence_check.py` 안에만.
 - **비교 방식**: 1.1/1.2 = SHA-256 (`tensor.detach().cpu().to(fp32).numpy().tobytes()`, Step 0과 동일 기준), 1.3 = `torch.equal` (element-wise 정확 비교).
 - `use_cache=False`, `attn_implementation="eager"`, fp32.
 
@@ -89,7 +89,8 @@ local_a100 교차 검증(invariant 0.3)은 미수행 — vast.ai 단독 진행 (
 - 🔵 **fork의 transformers 내부 모듈 의존**: fork 단일 파일은 `modeling_utils`, `activations`, `rope_utils`, `cache_utils` 등 transformers 내부 모듈에 다수 의존. Step 4 이후 CacheBlend 로직 진입 시 추가 fork가 필요할 수 있음 — 그 시점에 별도 결정.
 - 🔵 **dph_total 표시 불일치**: 할당 시 `search offers`는 $1.007/h, `show instance`는 $1.139/h로 표시. 콘솔이 authoritative. 원인 추적은 별도 round.
 - 🔵 **git push -u 누락**: `step/step_01_layerwise_forward` 첫 push 시 upstream 미설정으로 2개 commit이 로컬에만 있었고, 인스턴스 clone 단계에서 발견·정정. `vast_helper`에 step 브랜치 push 가드 추가는 별도 round.
-- 🔵 **확장본 §결과 저장 형식 예시의 `fork_source` 문구**: 코드(`run_layerwise_check.py`)는 "(import 문 외 byte 무수정)"으로 정정했으나 task 파일 예시 블록은 아직 "(무수정)" — 별도 [meta] round에서 정정 예정.
+- 🔵 **확장본 §결과 저장 형식 예시의 `fork_source` 문구**: 코드(`run_fork_equivalence_check.py`)는 "(import 문 외 byte 무수정)"으로 정정했으나 task 파일 예시 블록은 아직 "(무수정)" — 별도 [meta] round에서 정정 예정.
+- 🔵 **invariant 1.2 JSON key 정정**: Step 1 명명 정정 round에서 invariant 1.2의 JSON key를 `1.2_layerwise_hidden_equiv` → `1.2_per_layer_hidden_equiv`로 변경. 데이터 값(SHA, boolean)은 무변경, key 이름만 정정.
 
 ## 11. 다음 step
 

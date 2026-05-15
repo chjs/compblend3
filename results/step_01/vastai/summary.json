@@ -13,7 +13,7 @@
       "our_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
       "hf_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b"
     },
-    "1.2_layerwise_hidden_equiv": {
+    "1.2_per_layer_hidden_equiv": {
       "passed": true,
       "n_hidden_states": 33,
       "mismatched_layers": []

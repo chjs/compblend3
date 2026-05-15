@@ -1,4 +1,4 @@
-"""Step 1: Our (forked) layerwise forward = HF 표준 forward 검증 (no cache).
+"""Step 1: fork 동치성 검증 — fork된 코드 = HF 표준 forward (no cache).
 
 순차 로드 — HF 표준 → forward → 결과 CPU 이동 → del → our fork → forward → CPU 비교.
 invariant 1.1 (logits SHA-256 동일), 1.2 (layer hidden state SHA-256 동일),
@@ -179,7 +179,7 @@ def main() -> None:
                 "our_logits_sha256": our_logits_sha,
                 "hf_logits_sha256": hf_logits_sha,
             },
-            "1.2_layerwise_hidden_equiv": {
+            "1.2_per_layer_hidden_equiv": {
                 "passed": inv_1_2,
                 "n_hidden_states": len(hf["hidden_states"]),
                 "mismatched_layers": mismatched_layers,
