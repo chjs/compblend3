@@ -1,0 +1,501 @@
+{
+  "round": "C-7",
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0+cu128",
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA A100-SXM4-80GB",
+  "prompt": "The capital of France is",
+  "prefix_len": 6,
+  "decode_token_id": 5465,
+  "decode_token_decoded": "Paris",
+  "forward_setup": {
+    "split": {
+      "input_ids_shape": [
+        1,
+        6
+      ],
+      "attention_mask": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "split_padded": {
+      "input_ids_shape": [
+        1,
+        7
+      ],
+      "attention_mask": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    "single": {
+      "input_ids_shape": [
+        1,
+        7
+      ],
+      "attention_mask": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "all_use_cache_false": true
+  },
+  "E1_position_ids": {
+    "split_first6": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "split_padded_first6": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "single_first6": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "split_padded_position6": 6,
+    "single_position6": 6,
+    "split_padded_full": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "single_full": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "3way_first6_bitwise": true,
+    "padded_vs_single_full_match": true
+  },
+  "E2_rope_cos_sin": {
+    "cos": {
+      "split_vs_single": {
+        "shape_a": [
+          1,
+          6,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "sha_b": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "max_abs": 0.0,
+        "bitwise": true
+      },
+      "split_padded_vs_single": {
+        "shape_a": [
+          1,
+          7,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "sha_b": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "max_abs": 0.0,
+        "bitwise": true
+      },
+      "split_vs_split_padded": {
+        "shape_a": [
+          1,
+          6,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "sha_b": "111ce8690dd391ce7b98619d0de796f6c65af108ea126d778dedca5e4b8973a3",
+        "max_abs": 0.0,
+        "bitwise": true
+      }
+    },
+    "sin": {
+      "split_vs_single": {
+        "shape_a": [
+          1,
+          6,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "sha_b": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "max_abs": 0.0,
+        "bitwise": true
+      },
+      "split_padded_vs_single": {
+        "shape_a": [
+          1,
+          7,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "sha_b": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "max_abs": 0.0,
+        "bitwise": true
+      },
+      "split_vs_split_padded": {
+        "shape_a": [
+          1,
+          6,
+          128
+        ],
+        "shape_b": [
+          1,
+          7,
+          128
+        ],
+        "sliced_shape": [
+          1,
+          6,
+          128
+        ],
+        "sha_a": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "sha_b": "a910b8aba45377aa5ad06f06c1b42bf66335ff70a555c0229193e9e1ddd53f52",
+        "max_abs": 0.0,
+        "bitwise": true
+      }
+    },
+    "3way_all_bitwise_first6": true
+  },
+  "A4_post_input_layernorm_first6": {
+    "split_vs_single": {
+      "shape_a": [
+        1,
+        6,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "sha_b": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "split_padded_vs_single": {
+      "shape_a": [
+        1,
+        7,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "sha_b": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "split_vs_split_padded": {
+      "shape_a": [
+        1,
+        6,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "sha_b": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "max_abs": 0.0,
+      "bitwise": true
+    }
+  },
+  "F_q_proj": {
+    "F1_split_vs_single": {
+      "shape_a": [
+        1,
+        6,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "1f2ec2649bf165995ec41c4c3ef32b4149a77bc623b1b13ffd17f7508ce3a110",
+      "sha_b": "db02b2169316012312ce9b6ff02b80b6cb29ac8a13a5d66414368ee99fb82c25",
+      "max_abs": 2.384185791015625e-06,
+      "bitwise": false
+    },
+    "F2_split_padded_vs_single": {
+      "shape_a": [
+        1,
+        7,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "db02b2169316012312ce9b6ff02b80b6cb29ac8a13a5d66414368ee99fb82c25",
+      "sha_b": "db02b2169316012312ce9b6ff02b80b6cb29ac8a13a5d66414368ee99fb82c25",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "F3_split_vs_split_padded": {
+      "shape_a": [
+        1,
+        6,
+        4096
+      ],
+      "shape_b": [
+        1,
+        7,
+        4096
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        4096
+      ],
+      "sha_a": "1f2ec2649bf165995ec41c4c3ef32b4149a77bc623b1b13ffd17f7508ce3a110",
+      "sha_b": "db02b2169316012312ce9b6ff02b80b6cb29ac8a13a5d66414368ee99fb82c25",
+      "max_abs": 2.384185791015625e-06,
+      "bitwise": false
+    }
+  },
+  "F_k_proj": {
+    "F1_split_vs_single": {
+      "shape_a": [
+        1,
+        6,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "sha_b": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "F2_split_padded_vs_single": {
+      "shape_a": [
+        1,
+        7,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "sha_b": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "F3_split_vs_split_padded": {
+      "shape_a": [
+        1,
+        6,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "sha_b": "842f3928574f7a0d2e274df7c50716314c79346586475153fdb304286e42019a",
+      "max_abs": 0.0,
+      "bitwise": true
+    }
+  },
+  "F_v_proj": {
+    "F1_split_vs_single": {
+      "shape_a": [
+        1,
+        6,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "sha_b": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "F2_split_padded_vs_single": {
+      "shape_a": [
+        1,
+        7,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "sha_b": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "max_abs": 0.0,
+      "bitwise": true
+    },
+    "F3_split_vs_split_padded": {
+      "shape_a": [
+        1,
+        6,
+        1024
+      ],
+      "shape_b": [
+        1,
+        7,
+        1024
+      ],
+      "sliced_shape": [
+        1,
+        6,
+        1024
+      ],
+      "sha_a": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "sha_b": "569134cbc15f4f9f3629ad38c981070f82065369861102cd42c128873b1c3837",
+      "max_abs": 0.0,
+      "bitwise": true
+    }
+  }
+}
