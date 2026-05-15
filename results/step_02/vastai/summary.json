@@ -1,0 +1,33 @@
+{
+  "step": 2,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "torch_dtype": "float32",
+  "attention_implementation": "eager",
+  "transformers_version": "4.51.3",
+  "prompt": "The capital of France is",
+  "decode_token_id": 5465,
+  "decode_token_decoded": "Paris",
+  "invariants": {
+    "2.1_dynamic_cache_logits_equiv": {
+      "passed": true,
+      "cache_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+      "nocache_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b"
+    },
+    "2.2_per_layer_hidden_equiv": {
+      "passed": true,
+      "n_hidden_states": 33,
+      "mismatched_layers": []
+    },
+    "2.3A_split_vs_single_forward": {
+      "passed": false,
+      "comparison_tier": "FAIL",
+      "split_logits_sha256": "e581d7f715cffb6377e63d8f19d97af3ba1b1e2a9ed2817e1730539694172c18",
+      "single_logits_sha256": "513ab1dbfc006a86dd75b3fcb6702ce41fc091388a54bb0cbc3cc19a425a9a35",
+      "max_abs_diff": 6.198883056640625e-06,
+      "atol_threshold": 1e-06,
+      "fallback_used": false
+    }
+  },
+  "all_invariants_passed": false
+}
