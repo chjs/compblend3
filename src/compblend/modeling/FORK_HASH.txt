@@ -1,0 +1,32 @@
+# Step 1 — modeling_mistral.py fork hash + import 변환 기록 (invariant 실패 시 진단 1단계용)
+# 원본: transformers==4.51.3  transformers/models/mistral/modeling_mistral.py  (1101 lines)
+source_sha256: 0c475c456f73375a77c9efdde1ec1c2df8bcfcd58110f3552ef91f92434be9dc
+# fork: src/compblend/modeling/modeling_mistral.py = 상단 출처 주석 1줄 + 원본
+#   (import 12줄 상대→절대 변환, 본문 1089줄 byte 무수정)
+fork_sha256: ec45fb2555dbccc1d18b0b2c567d11cf1104d2748e6d7b29a0c1b7b818af6e7c
+#
+# 변환된 import 12줄 (< 원본 / > fork):
+< from ...activations import ACT2FN
+< from ...cache_utils import Cache, DynamicCache, SlidingWindowCache, StaticCache
+< from ...generation import GenerationMixin
+< from ...modeling_attn_mask_utils import AttentionMaskConverter
+< from ...modeling_flash_attention_utils import FlashAttentionKwargs
+< from ...modeling_outputs import (
+> from transformers.activations import ACT2FN
+> from transformers.cache_utils import Cache, DynamicCache, SlidingWindowCache, StaticCache
+> from transformers.generation import GenerationMixin
+> from transformers.modeling_attn_mask_utils import AttentionMaskConverter
+> from transformers.modeling_flash_attention_utils import FlashAttentionKwargs
+> from transformers.modeling_outputs import (
+< from ...modeling_rope_utils import ROPE_INIT_FUNCTIONS, dynamic_rope_update
+< from ...modeling_utils import ALL_ATTENTION_FUNCTIONS, PreTrainedModel
+< from ...processing_utils import Unpack
+< from ...utils import (
+> from transformers.modeling_rope_utils import ROPE_INIT_FUNCTIONS, dynamic_rope_update
+> from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS, PreTrainedModel
+> from transformers.processing_utils import Unpack
+> from transformers.utils import (
+< from ...utils.deprecation import deprecate_kwarg
+< from .configuration_mistral import MistralConfig
+> from transformers.utils.deprecation import deprecate_kwarg
+> from transformers.models.mistral.configuration_mistral import MistralConfig

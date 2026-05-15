@@ -90,4 +90,4 @@ local_a100 검증은 이번 step에서 **미수행** — 사용자 결정에 따
 
 ## 11. 다음 step
 
-Step 1 — Our layerwise forward = HF 표준 forward (no cache). HF 표준 forward와 우리 layerwise forward의 logits 일치를 검증한다.
+Step 1 — fork 동치성 검증 (fork된 코드 = HF 표준 forward, no cache). HF `modeling_mistral.py`를 fork해 HF 표준 forward와 logits·hidden state·q/k/v projection 일치를 검증한다.

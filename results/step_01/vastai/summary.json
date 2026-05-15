@@ -1,0 +1,28 @@
+{
+  "step": 1,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "torch_dtype": "float32",
+  "attention_implementation": "eager",
+  "transformers_version": "4.51.3",
+  "fork_source": "transformers/models/mistral/modeling_mistral.py @ 4.51.3 (import 문 외 byte 무수정)",
+  "prompt": "The capital of France is",
+  "invariants": {
+    "1.1_forward_logits_equiv": {
+      "passed": true,
+      "our_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+      "hf_logits_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b"
+    },
+    "1.2_per_layer_hidden_equiv": {
+      "passed": true,
+      "n_hidden_states": 33,
+      "mismatched_layers": []
+    },
+    "1.3_qkv_projection_equiv": {
+      "passed": true,
+      "n_layers": 32,
+      "mismatched": []
+    }
+  },
+  "all_invariants_passed": true
+}
