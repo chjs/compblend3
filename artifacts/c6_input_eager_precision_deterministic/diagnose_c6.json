@@ -1,0 +1,155 @@
+{
+  "round": "C-6",
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0+cu128",
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA A100-SXM4-80GB",
+  "prompt": "The capital of France is",
+  "prefix_len": 6,
+  "decode_token_id": 5465,
+  "decode_token_decoded": "Paris",
+  "condition_A_first_input_identity": {
+    "A1_input_ids_first6": {
+      "split": [
+        1,
+        415,
+        5565,
+        302,
+        4843,
+        349
+      ],
+      "single": [
+        1,
+        415,
+        5565,
+        302,
+        4843,
+        349
+      ],
+      "match": true
+    },
+    "A2_embed_first6": {
+      "split_sha256": "1abd9fb8726881bd36e43338d4d01ecc0ff06cd846404aa3052cc194d6c692df",
+      "single_sha256": "1abd9fb8726881bd36e43338d4d01ecc0ff06cd846404aa3052cc194d6c692df",
+      "max_abs": 0.0,
+      "match": true
+    },
+    "A3_layer0_input_first6": {
+      "split_sha256": "1abd9fb8726881bd36e43338d4d01ecc0ff06cd846404aa3052cc194d6c692df",
+      "single_sha256": "1abd9fb8726881bd36e43338d4d01ecc0ff06cd846404aa3052cc194d6c692df",
+      "max_abs": 0.0,
+      "match": true
+    },
+    "A4_post_input_layernorm_first6": {
+      "split_sha256": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "single_sha256": "f5663b3e3045c6b06a961d4dc1bd8ff2b1a2b76523d351fb7bb58713e08503f7",
+      "max_abs": 0.0,
+      "match": true
+    },
+    "all_pass": true
+  },
+  "condition_B_eager_mode": {
+    "attn_implementation_config": "eager",
+    "self_attn_class_name": "MistralAttention",
+    "self_attn_expected": "MistralAttention",
+    "self_attn_match": true,
+    "self_attn_forward_source": "/root/compblend3/src/compblend/modeling/modeling_mistral.py",
+    "q_proj_class_name": "Linear",
+    "q_proj_is_torch_nn_Linear": true,
+    "q_proj_forward_source": "/root/compblend3/.venv/lib/python3.10/site-packages/torch/nn/modules/linear.py",
+    "self_attn_is_not_sdpa": true,
+    "self_attn_is_not_flash": true
+  },
+  "condition_C_precision": {
+    "model_dtype": "torch.float32",
+    "first_param_dtype": "torch.float32",
+    "embed_weight_dtype": "torch.float32",
+    "layer0_qproj_weight_dtype": "torch.float32",
+    "layer0_qproj_weight_data_ptr": 140336479338496,
+    "layer0_qproj_weight_sha256": "e04dae4d00be44caf59574a24e78927b6026036b73721e0df06a49b94b2779cb",
+    "layer0_kproj_weight_sha256": "a43fdecf1d0dbb5225cf0f63cf9b4272a10cd8708ec487a150843eb6c6a1c08b",
+    "layer0_vproj_weight_sha256": "2dd07e4c149e5ffca841cfa196649bb138ee539b44ec62b5b119c08d92951ea4"
+  },
+  "condition_D_deterministic_mode": {
+    "post_setup": {
+      "label": "post_setup",
+      "use_deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "float32_matmul_precision": "highest",
+      "cublas_workspace_config": ":4096:8",
+      "torch_initial_seed": 42,
+      "torch_cuda_initial_seed": 42,
+      "python_random_state_hash": "a52169fac48aa2d8",
+      "numpy_random_state_hash": "e04780f9f608282d"
+    },
+    "pre_split_prefill": {
+      "label": "pre_split_prefill",
+      "use_deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "float32_matmul_precision": "highest",
+      "cublas_workspace_config": ":4096:8",
+      "torch_initial_seed": 42,
+      "torch_cuda_initial_seed": 42,
+      "python_random_state_hash": "a52169fac48aa2d8",
+      "numpy_random_state_hash": "e04780f9f608282d"
+    },
+    "pre_single": {
+      "label": "pre_single",
+      "use_deterministic_algorithms": true,
+      "deterministic_warn_only": false,
+      "cudnn_deterministic": true,
+      "cudnn_benchmark": false,
+      "cuda_matmul_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "float32_matmul_precision": "highest",
+      "cublas_workspace_config": ":4096:8",
+      "torch_initial_seed": 42,
+      "torch_cuda_initial_seed": 42,
+      "python_random_state_hash": "a52169fac48aa2d8",
+      "numpy_random_state_hash": "e04780f9f608282d"
+    },
+    "gpu_determinism_quick_check": {
+      "matmul_same_input_bitwise": true,
+      "max_abs_diff": 0.0
+    }
+  },
+  "bonus_qkv_proj_divergence": {
+    "note": "조건 A·B·C·D 검증 하에서 C-4의 q_proj 발산 재측정",
+    "qproj_input_shape_split_first6": [
+      1,
+      6,
+      4096
+    ],
+    "qproj_input_shape_split_full": [
+      1,
+      6,
+      4096
+    ],
+    "qproj_input_shape_single_first6": [
+      1,
+      6,
+      4096
+    ],
+    "qproj_input_shape_single_full": [
+      1,
+      7,
+      4096
+    ],
+    "q_proj_out_first6_match_bitwise": false,
+    "q_proj_out_first6_max_abs": 2.384185791015625e-06,
+    "k_proj_out_first6_match_bitwise": true,
+    "k_proj_out_first6_max_abs": 0.0,
+    "v_proj_out_first6_match_bitwise": true,
+    "v_proj_out_first6_max_abs": 0.0
+  }
+}
