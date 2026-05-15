@@ -69,8 +69,10 @@ def setup_deterministic() -> None:
         pass
 
 
-def tdiff(a: torch.Tensor, b: torch.Tensor, atols=(0.0, 1e-8, 1e-7, 1e-6)) -> dict:
-    """두 텐서의 비교 — shape 동일하면 max/mean abs diff + 다중 atol allclose."""
+def tdiff(a: torch.Tensor, b: torch.Tensor) -> dict:
+    """두 텐서의 비교 — shape 동일하면 max/mean abs diff + 다중 atol allclose.
+    Key 명: allclose_atol_0, allclose_atol_1e-8, allclose_atol_1e-7, allclose_atol_1e-6 (단순화).
+    """
     a = a.detach().to("cpu", torch.float32)
     b = b.detach().to("cpu", torch.float32)
     out = {"shape_a": list(a.shape), "shape_b": list(b.shape)}
@@ -82,8 +84,10 @@ def tdiff(a: torch.Tensor, b: torch.Tensor, atols=(0.0, 1e-8, 1e-7, 1e-6)) -> di
     out["max_abs"] = float(d.max())
     out["mean_abs"] = float(d.mean())
     out["argmax_idx"] = [int(x) for x in np.unravel_index(int(d.argmax().item()), a.shape)]
-    for at in atols:
-        out[f"allclose_atol_{at}"] = bool(torch.allclose(a, b, atol=at, rtol=0))
+    out["allclose_atol_0"] = bool(torch.allclose(a, b, atol=0.0, rtol=0))
+    out["allclose_atol_1e-8"] = bool(torch.allclose(a, b, atol=1e-8, rtol=0))
+    out["allclose_atol_1e-7"] = bool(torch.allclose(a, b, atol=1e-7, rtol=0))
+    out["allclose_atol_1e-6"] = bool(torch.allclose(a, b, atol=1e-6, rtol=0))
     return out
 
 
@@ -516,8 +520,8 @@ def main() -> None:
                     "argmax_idx"])
         for d in intra_diffs:
             w.writerow([d["name"], d.get("shape_a"), d.get("max_abs"), d.get("mean_abs"),
-                        d.get("allclose_atol_0.0"), d.get("allclose_atol_1e-08"),
-                        d.get("allclose_atol_1e-07"), d.get("allclose_atol_1e-06"),
+                        d.get("allclose_atol_0"), d.get("allclose_atol_1e-8"),
+                        d.get("allclose_atol_1e-7"), d.get("allclose_atol_1e-6"),
                         d.get("argmax_idx")])
     print(f"  → {csv_path}")
 
@@ -526,7 +530,7 @@ def main() -> None:
     for d in intra_diffs[:24]:
         ma = d.get("max_abs")
         ma_str = "None" if ma is None else f"{ma:.3e}"
-        ac0 = d.get("allclose_atol_0.0")
+        ac0 = d.get("allclose_atol_0")
         intra_bullets.append(f"- {d['name']}: max_abs={ma_str}, allclose_0={ac0}")
     intra_bullets_str = "\n".join(intra_bullets)
 
@@ -538,7 +542,7 @@ def main() -> None:
         sw_note_line = f"with sliding_window=None: L0 prefix vs full slice max_abs={sw_max_str}"
 
     mask_slice_max = mask_prefix_slice_cmp.get("max_abs") if mask_prefix_slice_cmp else None
-    mask_slice_allclose = mask_prefix_slice_cmp.get("allclose_atol_0.0") if mask_prefix_slice_cmp else None
+    mask_slice_allclose = mask_prefix_slice_cmp.get("allclose_atol_0") if mask_prefix_slice_cmp else None
     mask_future_max = mask_future_col_check.get("future_col_max") if mask_future_col_check else None
     mask_future_full = mask_future_col_check.get("fully_masked_future") if mask_future_col_check else None
 
@@ -557,12 +561,12 @@ def main() -> None:
 - mask_full future column (query rows 0..{prefix_len-1}, key {prefix_len}): max={mask_future_max}, fully_masked={mask_future_full}
 
 ## §2. RoPE cos/sin
-- cos prefix vs full[:prefix_len]: max_abs={cos_cmp['max_abs']:.3e}, allclose_0={cos_cmp['allclose_atol_0.0']}
-- sin prefix vs full[:prefix_len]: max_abs={sin_cmp['max_abs']:.3e}, allclose_0={sin_cmp['allclose_atol_0.0']}
+- cos prefix vs full[:prefix_len]: max_abs={cos_cmp['max_abs']:.3e}, allclose_0={cos_cmp['allclose_atol_0']}
+- sin prefix vs full[:prefix_len]: max_abs={sin_cmp['max_abs']:.3e}, allclose_0={sin_cmp['allclose_atol_0']}
 
 ## §4. Manual Layer 0 vs HF Layer 0 (sanity)
-- prefix: max_abs={sanity_p['max_abs']:.3e}, allclose_0={sanity_p['allclose_atol_0.0']}
-- full: max_abs={sanity_f['max_abs']:.3e}, allclose_0={sanity_f['allclose_atol_0.0']}
+- prefix: max_abs={sanity_p['max_abs']:.3e}, allclose_0={sanity_p['allclose_atol_0']}
+- full: max_abs={sanity_f['max_abs']:.3e}, allclose_0={sanity_f['allclose_atol_0']}
 
 (manual reproduces HF if these are ~ 0)
 
@@ -602,8 +606,8 @@ def main() -> None:
 
     print("\n=== Done. 핵심 결과: ===")
     print(f"  첫 intra-op divergence: {first_div_idx}")
-    print(f"  mask prefix slice 일치: {mask_prefix_slice_cmp.get('allclose_atol_0.0') if mask_prefix_slice_cmp else 'N/A'}")
-    print(f"  RoPE cos/sin 일치 (bitwise): {cos_cmp['allclose_atol_0.0']} / {sin_cmp['allclose_atol_0.0']}")
+    print(f"  mask prefix slice 일치: {mask_prefix_slice_cmp.get('allclose_atol_0') if mask_prefix_slice_cmp else 'N/A'}")
+    print(f"  RoPE cos/sin 일치 (bitwise): {cos_cmp['allclose_atol_0']} / {sin_cmp['allclose_atol_0']}")
     print(f"  manual vs HF sanity (prefix): max_abs={sanity_p['max_abs']:.3e}")
 
 
