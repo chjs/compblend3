@@ -123,7 +123,7 @@ python tasks/step_01_fork_equivalence/run_fork_equivalence_check.py --out result
   "torch_dtype": "float32",
   "attention_implementation": "eager",
   "transformers_version": "4.51.3",
-  "fork_source": "transformers/models/mistral/modeling_mistral.py @ 4.51.3 (무수정)",
+  "fork_source": "transformers/models/mistral/modeling_mistral.py @ 4.51.3 (import 문 외 byte 무수정)",
   "prompt": "The capital of France is",
   "invariants": {
     "1.1_forward_logits_equiv": {

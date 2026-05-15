@@ -558,4 +558,9 @@ KVzip-compressed KV를 CacheBlend와 어떻게 결합할지의 가설.
   - 파일/디렉토리 rename(git mv, history 유지): `tasks/step_01_layerwise_forward.md`→`step_01_fork_equivalence.md`, `tasks/step_01/`→`tasks/step_01_fork_equivalence/`, `run_layerwise_check.py`→`run_fork_equivalence_check.py`, `docs/reports/step_01_layerwise_report.md`→`step_01_fork_equivalence_report.md`. 내부 참조·§6.3 표 Step 1 행 정정.
   - invariant 1.2 JSON key 정정: `1.2_layerwise_hidden_equiv` → `1.2_per_layer_hidden_equiv` (3곳: task 스키마 예시·run script·summary.json). 데이터 값(SHA·boolean) 무변경, key 이름만 정정.
   - 보존: tag `step_01_done`(step 번호 기반, 이름 무관)·commit message history·`results/step_01/` 디렉토리·summary.json 데이터 값·step 브랜치명 `step/step_01_layerwise_forward`(merge 후 삭제될 ref).
+- **2026-05-15 v11**: Step 2 진입 전 `[meta]` round — 보류 항목 3건 정리
+  - (c) `tasks/step_01_fork_equivalence.md` §결과 저장 형식 예시의 `fork_source` 문구 정정: "(무수정)" → "(import 문 외 byte 무수정)" (Step 1 보고서 §10에서 예고된 항목).
+  - (d) CLAUDE.md §4.5 신설(권장): task 파일 확장 시 외부 코드 의존 가정의 사전 확인 (Step 1 fork 단일 파일 import 가정 실패 사례에서 도출).
+  - (e) CLAUDE.md §4.5 (같은 §): round 중간 결정 변경 시 초반 기록 재검토 (Step 1 명명 정정 round의 JSON key 보존 목록 부정확 사례에서 도출).
+  - 분리: (a) `scripts/vast_helper.py` push `-u` 가드는 §7.2 `[meta]` 정의(코드는 메타·스펙 문서 아님)에 부합 안 함 — Step 2 step 브랜치 첫 commit으로 처리. (b) dph_total 불일치 추적은 다음 vast.ai 실행 시 데이터 추가 수집 후. (f) `[meta]` prefix 정의·분류 검토는 명명 round로 분리.
   - step 브랜치 마지막 commit으로 처리(`[meta]` prefix) — Step 1 파일 대부분이 미merge 상태라 main 직접 작업 불가, Step 1 merge 시 정정된 이름으로 main 반영.

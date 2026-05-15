@@ -162,6 +162,13 @@ git add + commit + push
 
 다른 step에서는 사용자가 필요하다고 판단하지 않는 한 vast.ai 결과만으로 진행 OK.
 
+### 4.5 Round 진행 시 권장 사항
+
+다음은 절대 규칙이 아니라 권장 사항(round 효율을 위한 경험칙).
+
+- **외부 코드 의존 가정의 사전 확인**: task 파일 확장(stub→자체완결) 시 외부 코드(transformers 내부 모듈, vast.ai CLI 스키마, HF 모델 구조 등)에 대한 가정이 들어가면, 명세 commit 전에 해당 코드를 직접 열어 가정을 확인한다. 미검증 가정이 명세에 들어가면 구현 단계에서 막힌다 (Step 1 fork 단일 파일 import 가정 실패 사례).
+- **Round 중간 결정 변경 시 초반 기록 재검토**: round 진행 중 사용자 결정으로 작업 범위가 변경되면, round 초반에 작성한 기록(PROGRESS, DECISIONS 등)이 변경 후 결정과 일치하는지 commit 전 재검토한다. 초반 기록과 후반 결정이 어긋난 채 commit되면 history에 모순이 남는다 (Step 1 명명 정정 round의 JSON key 보존 목록 사례).
+
 ---
 
 ## 5. 보고서 작성 규칙 (compblend2 계승)
