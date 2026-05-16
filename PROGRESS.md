@@ -7,11 +7,11 @@
 
 ## 현재 상태
 
-**Phase**: Phase 1 (Step 0~3) — Step 2 진행 중 (옵션 B 채택 후 코드/명세 갱신 완료, vast.ai 실행 전)
-**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅
-**진행 중**: Step 2 — C-3~C-7 진단으로 cuBLAS shape-dependent dispatch mechanism 식별. 옵션 B 채택(2.3A=padded cache K/V[:6] bitwise, 2.3B=운영 split drift 측정). task 파일·script·DECISIONS.md·PROGRESS.md 갱신 완료. 다음: MacBook smoke → commit + push → vast.ai 실행 별도 round 승인
-**Next task file**: `tasks/step_02_dynamic_cache.md` (옵션 B 정의 완료)
-**Branch**: `step/step_02_dynamic_cache` (active)
+**Phase**: Phase 1 (Step 0~3) — Step 2 실험 통과, 보고서 작성 완료, 사용자 리뷰 대기
+**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 invariant 2.1·2.2·2.3A 모두 PASS ✅
+**Next**: Step 2 사용자 리뷰 → 승인 시 `main`에 `--no-ff` merge + tag `step_02_done` + 브랜치 삭제 → Step 3 진입
+**Next task file**: `tasks/step_03_chunked_kv_store.md` (현재 stub — 진입 전 확장 필요)
+**Branch**: `step/step_02_dynamic_cache` (리뷰 승인 후 merge·삭제)
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|---|---|---|
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
 | 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | 🔵 | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
-| 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | 🔵 | - | C-3~C-7 진단 후 옵션 B 채택, 코드 갱신 완료, vast.ai 실행 대기 |
+| 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | 🔵 | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌), 리뷰 대기 |
 | 3 | ChunkedKVStore 정확성 | ⬜ | - | - |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
@@ -107,19 +107,17 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 ## 다음 행동 (Next actions)
 
-Step 2 옵션 B 채택 후 코드/명세 갱신 완료. 남은 것:
+Step 2 실험 통과 + 보고서 작성 완료. 남은 것:
 
-1. **MacBook smoke** — `tasks/step_02_dynamic_cache/run_dynamic_cache_check.py` py_compile + import OK (완료)
-2. 사용자 확인 → commit + push (step/step_02_dynamic_cache 브랜치)
-3. vast.ai 실행 — 별도 round 승인. 인스턴스 할당 → 실행 → 결과 회수 → destroy
-4. 예상: 2.1·2.2·2.3A PASS, 2.3B 측정값만 기록. 예상 외 시 멈추고 보고
-5. 결과 후 보고서 작성 → 사용자 리뷰 → 승인 시 `main --no-ff` merge + tag `step_02_done`
+1. **사용자 리뷰** — `docs/reports/step_02_dynamic_cache_report.md` 검토
+2. 승인 시: `git checkout main && git merge --no-ff step/step_02_dynamic_cache` → `git tag step_02_done` → `git push origin main step_02_done` → step 브랜치 삭제 (로컬+원격)
+3. Step 3 진입 — `tasks/step_03_chunked_kv_store.md`는 현재 stub, 진입 전 자체완결 task 파일로 확장 필요
 
-별도 round 보류: 다른 진단 스크립트의 RoPE hook 첫 call 캡처 defect (향후 hook 사용 step에서 fix).
+별도 round 보류: 다른 진단 스크립트의 RoPE hook 첫 call 캡처 defect (향후 hook 사용 step에서 fix). 2.3B drift_budget(1e-4)을 향후 step의 regression 기준으로 사용할지는 Step 3 진입 전 별도 결정.
 
 ## 다음 세션 첫 행동
 
-- Step 2 코드 갱신 commit + push (이번 round에서 완료될 예정). 그 다음 vast.ai 실행 별도 round 승인 대기.
+- Step 2 사용자 리뷰 대기. 승인 시 `main --no-ff` merge + tag `step_02_done` + 브랜치 삭제 → Step 3 (task 파일 stub 확장부터).
 
 ---
 
@@ -160,5 +158,6 @@ Step 2 옵션 B 채택 후 코드/명세 갱신 완료. 남은 것:
   - **결론**: cuBLAS shape-dependent kernel dispatch가 mechanism. atol 완화는 사용자 전제 위배 → 명세를 분리.
   - **옵션 B (2026-05-16 결정)**: 2.3A를 "padded forward(M=7, mask=[1*6,0], use_cache=True) vs single forward(M=7, mask=[1]*7, use_cache=True)의 DynamicCache K/V[:6] bitwise"로 재정의. Gate = `torch.equal`. 2.3B 신설(운영 split forward drift 측정, gate ❌). 둘 다 단일 forward + cache empty 시작 → attention shape `(Q=7, K=7)` 양쪽 동일 → same-shape bitwise 가능. mechanism justification은 task 파일 §2.3A에 명시.
   - **task 파일·script·DECISIONS 갱신**: `tasks/step_02_dynamic_cache.md` §2.3A 옵션 B 정의 + §2.3B 신설 + 의사 코드·Tensor shape·summary.json schema·보고서 가이드·솔직성 노트 갱신. `tasks/step_02_dynamic_cache/run_dynamic_cache_check.py` 재작성 (5 forward: a no-cache / b cache / c padded / d single / e operational split, forward hook ❌, K/V 직접 접근). DECISIONS.md §13 v13 (옵션 B 결정 + CacheBlend chunk padding 사전 가정). 누적 vast.ai 비용은 보고서 §3 환경에서 정산.
+- **2026-05-17 (Step 2 실험 + 보고서 작성)**: vast.ai A100-SXM4-80GB (instance `36876915`, dph_total `$1.21/h`, running 228초, 추정 비용 ~$0.16) 에서 옵션 B 검증 — **invariant 2.1·2.2·2.3A 모두 PASS** ✅ (32 layer × K/V `torch.equal` 통과, mismatched=[]). 2.3B drift 측정: `max_abs=6.20e-06`, `argmax_match=True`, `top5_overlap=5/5`, `drift_budget_exceeded=False`. decode 토큰 `5465="Paris"` (Step 0/1 일치). `all_invariants_passed=true`. 결과 commit `84e7d63`. 보고서 `docs/reports/step_02_dynamic_cache_report.md` 작성 (11 섹션) — §6 mechanism interpretation으로 옵션 B의 same-shape (Q=7, K=7) 구조와 prefill cache + padded decode 2-step 구조 (Q=7, K=13)의 구분 명시, §7 operational drift의 mechanism 정량화, §9 CacheBlend chunk padding 사전 메모와의 정합, §10에서 직전 작업 0의 K_total mismatch 분석 정정 명시. 사용자 리뷰 대기. Step 2 누적 vast.ai 비용 ~$1.0 추정 (옵션 A/E + C-3/C-4/C-6/C-7 + 본 실행), 정확 비용은 콘솔 참조.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)
