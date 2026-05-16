@@ -103,6 +103,53 @@ def _ensure_api_key() -> None:
     print("  vastai api-key 등록 완료")
 
 
+def _verify_current_branch_pushed() -> None:
+    """현재 git 브랜치가 origin에 push됐고 local HEAD와 동기화됐는지 검증.
+
+    가드 발동 지점: `allocate_instance()` 시작 시 — 인스턴스 할당 **전**.
+    실패 시 `sys.exit` (인스턴스 할당 안 함, 비용 0).
+
+    검사:
+      1. 현재 브랜치가 origin에 존재 (`git push -u origin <branch>` 누락 방지)
+      2. local HEAD == origin/<branch> (local에 push되지 않은 commit 방지)
+
+    `main`은 검사 생략 — Phase 단위 작업/메타 commit 시점에는 main에서 호출될 수
+    있고, main은 push 동기화 상태라 가정 (사용자가 push 안 한 main commit으로
+    인스턴스 할당하는 경우는 사실상 없음).
+
+    배경: 2026-05-15 Step 1 첫 인스턴스 셋업 시 step 브랜치가 upstream 없이
+    생성돼 commit이 로컬에만 있었고, 인스턴스 clone+checkout 단계에서 발견됨.
+    DECISIONS.md §13 v11에서 가드 추가 합의.
+    """
+    res = _run(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    branch = res.stdout.strip()
+    if branch in ("main", "HEAD"):
+        print(f"  push 가드: branch={branch} — 검사 생략")
+        return
+
+    res = _run(["git", "rev-parse", "HEAD"])
+    local = res.stdout.strip()
+
+    res = _run(["git", "ls-remote", "origin", branch], check=False)
+    if res.returncode != 0 or not res.stdout.strip():
+        sys.exit(
+            f"[vast_helper] push 가드 발동 — step 브랜치 `{branch}`가 origin에 없음.\n"
+            f"  인스턴스 할당 전 MacBook에서 다음 실행 필요:\n"
+            f"    git push -u origin {branch}\n"
+            f"  가드 단계: allocate_instance() 시작 시, 인스턴스 할당 ❌."
+        )
+    remote = res.stdout.split()[0]
+    if local != remote:
+        sys.exit(
+            f"[vast_helper] push 가드 발동 — local HEAD가 origin/{branch}와 불일치.\n"
+            f"  local : {local[:7]}\n"
+            f"  origin: {remote[:7]}\n"
+            f"  `git push` 후 재실행.\n"
+            f"  가드 단계: allocate_instance() 시작 시, 인스턴스 할당 ❌."
+        )
+    print(f"  push 가드 통과 — `{branch}` @ {local[:7]} == origin/{branch}")
+
+
 def allocate_instance() -> dict:
     """A100-SXM4 80GB 인스턴스를 검색·할당하고 SSH 접속 정보를 반환.
 
@@ -112,6 +159,7 @@ def allocate_instance() -> dict:
     반환: {"instance_id": int, "ssh_host": str, "ssh_port": int}
     """
     _ensure_api_key()
+    _verify_current_branch_pushed()  # push -u 가드 (DECISIONS.md §13 v11) — 인스턴스 할당 전 fail-fast.
 
     # 1) offer 검색 — 최저가 선택
     print("[allocate] offer 검색")

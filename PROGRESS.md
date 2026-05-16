@@ -7,11 +7,11 @@
 
 ## 현재 상태
 
-**Phase**: Phase 1 (Step 0~3) — Step 1 실험 통과, 사용자 리뷰 대기
-**완료**: Phase 0 전체 ✅ + Step 0 (결정론, tag `step_00_done`) ✅ + Step 1 (fork 동치성 검증) invariant 1.1/1.2/1.3 통과 ✅
-**Next**: Step 1 사용자 리뷰 → 승인 시 `main`에 `--no-ff` merge + tag `step_01_done` + 브랜치 삭제 → Step 2 진입
-**Next task file**: `tasks/step_02_dynamic_cache.md` (현재 stub — 진입 전 확장 필요)
-**Branch**: `step/step_01_layerwise_forward` (리뷰 승인 후 merge·삭제)
+**Phase**: Phase 1 (Step 0~3) — Step 2 실험 통과, 보고서 작성 완료, 사용자 리뷰 대기
+**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 invariant 2.1·2.2·2.3A 모두 PASS ✅
+**Next**: Step 2 사용자 리뷰 → 승인 시 `main`에 `--no-ff` merge + tag `step_02_done` + 브랜치 삭제 → Step 3 진입
+**Next task file**: `tasks/step_03_chunked_kv_store.md` (현재 stub — 진입 전 확장 필요)
+**Branch**: `step/step_02_dynamic_cache` (리뷰 승인 후 merge·삭제)
 
 ---
 
@@ -39,7 +39,7 @@
 |---|---|---|---|---|
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
 | 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | 🔵 | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
-| 2 | HF DynamicCache forward = no-cache forward | ⬜ | - | - |
+| 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | 🔵 | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌), 리뷰 대기 |
 | 3 | ChunkedKVStore 정확성 | ⬜ | - | - |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
@@ -107,19 +107,17 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 ## 다음 행동 (Next actions)
 
-Step 1 실험 통과 (invariant 1.1/1.2/1.3 ✅), `step/step_01_layerwise_forward` 브랜치에 commit 완료. 남은 것:
+Step 2 실험 통과 + 보고서 작성 완료. 남은 것:
 
-1. **사용자 리뷰** — `docs/reports/step_01_fork_equivalence_report.md` 검토
-2. 승인 시: `git checkout main && git merge --no-ff step/step_01_layerwise_forward` → `git tag step_01_done` → `git push origin main step_01_done` → step 브랜치 삭제(로컬+원격)
-3. Step 2 진입 — `tasks/step_02_dynamic_cache.md`는 현재 stub(30줄), 진입 전 자체완결 task 파일로 확장 필요
+1. **사용자 리뷰** — `docs/reports/step_02_dynamic_cache_report.md` 검토
+2. 승인 시: `git checkout main && git merge --no-ff step/step_02_dynamic_cache` → `git tag step_02_done` → `git push origin main step_02_done` → step 브랜치 삭제 (로컬+원격)
+3. Step 3 진입 — `tasks/step_03_chunked_kv_store.md`는 현재 stub, 진입 전 자체완결 task 파일로 확장 필요
 
-로컬 A100 교차검증(invariant 0.3)은 미수행 — 사용자 결정 시 별도 round.
-
-별도 round 보류: `vast_helper` push `-u` 가드 / dph_total 불일치 추적 / 확장본 `fork_source` 예시 정정 `[meta]` / CLAUDE.md "외부 코드 의존 사전 확인" 메모.
+별도 round 보류: 다른 진단 스크립트의 RoPE hook 첫 call 캡처 defect (향후 hook 사용 step에서 fix). 2.3B drift_budget(1e-4)을 향후 step의 regression 기준으로 사용할지는 Step 3 진입 전 별도 결정.
 
 ## 다음 세션 첫 행동
 
-- Step 1 사용자 리뷰 대기. 승인 시 `main`에 `--no-ff` merge + tag `step_01_done` + 브랜치 삭제 → Step 2 (task 파일 stub 확장부터)
+- Step 2 사용자 리뷰 대기. 승인 시 `main --no-ff` merge + tag `step_02_done` + 브랜치 삭제 → Step 3 (task 파일 stub 확장부터).
 
 ---
 
@@ -152,5 +150,14 @@ Step 1 실험 통과 (invariant 1.1/1.2/1.3 ✅), `step/step_01_layerwise_forwar
 - **2026-05-15 (Step 1 명명 정정)**: `layerwise` → `fork_equivalence` rename. Step 1은 fork 무수정(import 외) 동치성 검증이고 layerwise forward 작성이 아님 — "layerwise"가 "layerwise forward 작성"으로 오독될 소지가 있어 Step 2 진입 전(정정 비용 최소 시점)에 정리. 진짜 layerwise forward는 Step 4(CacheBlend)에서 작성 예정. 파일/디렉토리 rename(git mv) + 내부 참조 정정. invariant 1.2 JSON key는 `1.2_layerwise_hidden_equiv`→`1.2_per_layer_hidden_equiv`로 정정(데이터 값 무변경). tag `step_01_done`·commit message history·summary.json 데이터 값·step 브랜치명은 보존. DECISIONS.md §13 v10.
 - **2026-05-15 (Step 1 merge + Step 2 진입 전 `[meta]` round)**: Step 1 → main `--no-ff` merge(`0cede3f`), tag `step_01_done`, 브랜치 삭제. `[meta]` round 3건: (c) task 파일 `fork_source` 예시 "(무수정)"→"(import 문 외 byte 무수정)" 정정, (d) CLAUDE.md §4.5 권장 "외부 코드 의존 사전 확인" 메모, (e) CLAUDE.md §4.5 권장 "round 중간 결정 변경 시 초반 기록 재검토" 메모. (a) `vast_helper` push `-u` 가드는 §7.2 `[meta]` 정의(코드 미부합) 사유로 Step 2 step 브랜치 첫 commit으로 분리. DECISIONS.md §13 v11.
 - **2026-05-15 (Step 2 task 파일 확장)**: stub(30줄) → 자체완결 spec. 작업 0(외부 코드 의존 사전 확인, CLAUDE.md §4.5 (d) 첫 적용)에서 transformers 4.51.3은 legacy Tuple 미지원·`Cache` 서브클래스만 허용 확인 → Step 2 비교 surface 명확. Invariant 2.1(logits SHA-256)·2.2(layer hidden SHA-256)·2.3A(split vs single forward, **bitwise 1차 → atol 1e-6 fallback → 실패 시 보고**). prompt 동일, decode = greedy argmax, `set_all_seeds(42)` 매 forward 직전. DECISIONS.md §13 v12.
+- **2026-05-16 (Step 2 진단 round C-3~C-7 + invariant 2.3 옵션 B 채택)**: 초기 실행에서 2.3A FAIL (max_abs=6.20e-06). 5 round 진단으로 원인 식별:
+  - **C-3** prefix KV drift 분포 분석 (case=C, layer 1부터 drift). 결과: `artifacts/c3_diagnosis/`, commit `60d3e18`.
+  - **C-4** Layer 0 intra-op divergence localization. 결과: 첫 발산 = `02_q_proj` (max_abs=2.384e-06), k_proj/v_proj는 bitwise. `artifacts/c4_layer0_intra_op/`, commit `5270e30`.
+  - **C-6** 4 조건 명시 검증 (입력·eager·정밀도·deterministic). 모두 ✅ 통과 + q_proj 발산 재현. `artifacts/c6_input_eager_precision_deterministic/`, commit `fb1a9e5`.
+  - **C-7** padded shape + position 정보 검증. **F2 결과: split_padded vs single q_proj first 6 max_abs=0 bitwise** — GEMM input shape (M=6 vs M=7)이 cuBLAS의 "동일 순서" 위반 원인 확정. position_ids·RoPE는 3-way bitwise (정확). `artifacts/c7_padded_shape_position_info/`, commit `36de610`.
+  - **결론**: cuBLAS shape-dependent kernel dispatch가 mechanism. atol 완화는 사용자 전제 위배 → 명세를 분리.
+  - **옵션 B (2026-05-16 결정)**: 2.3A를 "padded forward(M=7, mask=[1*6,0], use_cache=True) vs single forward(M=7, mask=[1]*7, use_cache=True)의 DynamicCache K/V[:6] bitwise"로 재정의. Gate = `torch.equal`. 2.3B 신설(운영 split forward drift 측정, gate ❌). 둘 다 단일 forward + cache empty 시작 → attention shape `(Q=7, K=7)` 양쪽 동일 → same-shape bitwise 가능. mechanism justification은 task 파일 §2.3A에 명시.
+  - **task 파일·script·DECISIONS 갱신**: `tasks/step_02_dynamic_cache.md` §2.3A 옵션 B 정의 + §2.3B 신설 + 의사 코드·Tensor shape·summary.json schema·보고서 가이드·솔직성 노트 갱신. `tasks/step_02_dynamic_cache/run_dynamic_cache_check.py` 재작성 (5 forward: a no-cache / b cache / c padded / d single / e operational split, forward hook ❌, K/V 직접 접근). DECISIONS.md §13 v13 (옵션 B 결정 + CacheBlend chunk padding 사전 가정). 누적 vast.ai 비용은 보고서 §3 환경에서 정산.
+- **2026-05-17 (Step 2 실험 + 보고서 작성)**: vast.ai A100-SXM4-80GB (instance `36876915`, dph_total `$1.21/h`, running 228초, 추정 비용 ~$0.16) 에서 옵션 B 검증 — **invariant 2.1·2.2·2.3A 모두 PASS** ✅ (32 layer × K/V `torch.equal` 통과, mismatched=[]). 2.3B drift 측정: `max_abs=6.20e-06`, `argmax_match=True`, `top5_overlap=5/5`, `drift_budget_exceeded=False`. decode 토큰 `5465="Paris"` (Step 0/1 일치). `all_invariants_passed=true`. 결과 commit `84e7d63`. 보고서 `docs/reports/step_02_dynamic_cache_report.md` 작성 (11 섹션) — §6 mechanism interpretation으로 옵션 B의 same-shape (Q=7, K=7) 구조와 prefill cache + padded decode 2-step 구조 (Q=7, K=13)의 구분 명시, §7 operational drift의 mechanism 정량화, §9 CacheBlend chunk padding 사전 메모와의 정합, §10에서 직전 작업 0의 K_total mismatch 분석 정정 명시. 사용자 리뷰 대기. Step 2 누적 vast.ai 비용 ~$1.0 추정 (옵션 A/E + C-3/C-4/C-6/C-7 + 본 실행), 정확 비용은 콘솔 참조.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)

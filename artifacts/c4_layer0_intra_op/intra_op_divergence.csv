@@ -1,0 +1,25 @@
+intermediate,shape,max_abs_diff,mean_abs_diff,allclose_atol_0,allclose_atol_1e-8,allclose_atol_1e-7,allclose_atol_1e-6,argmax_idx
+00_hidden_in,"[1, 6, 4096]",0.0,0.0,True,True,True,True,"[0, 0, 0]"
+01_input_layernorm,"[1, 6, 4096]",0.0,0.0,True,True,True,True,"[0, 0, 0]"
+02_q_proj,"[1, 6, 4096]",2.384185791015625e-06,8.755200298082855e-08,False,False,False,False,"[0, 4, 3833]"
+03_k_proj,"[1, 6, 1024]",0.0,0.0,True,True,True,True,"[0, 0, 0]"
+04_v_proj,"[1, 6, 1024]",0.0,0.0,True,True,True,True,"[0, 0, 0]"
+05_q_reshape,"[1, 32, 6, 128]",2.384185791015625e-06,8.755200298082855e-08,False,False,False,False,"[0, 29, 4, 121]"
+06_k_reshape,"[1, 8, 6, 128]",0.0,0.0,True,True,True,True,"[0, 0, 0, 0]"
+07_v_reshape,"[1, 8, 6, 128]",0.0,0.0,True,True,True,True,"[0, 0, 0, 0]"
+08_q_rot,"[1, 32, 6, 128]",2.384185791015625e-06,8.901741921363282e-08,False,False,False,False,"[0, 29, 4, 121]"
+09_k_rot,"[1, 8, 6, 128]",0.0,0.0,True,True,True,True,"[0, 0, 0, 0]"
+10_k_rep,"[1, 32, 6, 128]",0.0,0.0,True,True,True,True,"[0, 0, 0, 0]"
+11_v_rep,"[1, 32, 6, 128]",0.0,0.0,True,True,True,True,"[0, 0, 0, 0]"
+12_attn_raw,"[1, 32, 6, 6]",,,,,,,
+13_attn_masked,"[1, 32, 6, 6]",,,,,,,
+14_attn_probs,"[1, 32, 6, 6]",,,,,,,
+15_attn_output_pre_oproj,"[1, 6, 4096]",4.0978193283081055e-08,3.4018385330902845e-10,False,False,True,True,"[0, 5, 3742]"
+16_o_proj,"[1, 6, 4096]",9.313225746154785e-09,4.457331448382007e-10,False,True,True,True,"[0, 1, 3240]"
+17_post_attn_residual,"[1, 6, 4096]",9.313225746154785e-09,4.466331748886887e-10,False,True,True,True,"[0, 1, 3240]"
+18_post_attn_layernorm,"[1, 6, 4096]",9.5367431640625e-07,4.7885063025887575e-08,False,False,False,True,"[0, 0, 3570]"
+19_gate_proj,"[1, 6, 14336]",3.8743019104003906e-07,1.92874427540346e-08,False,False,False,True,"[0, 5, 12522]"
+20_up_proj,"[1, 6, 14336]",4.76837158203125e-07,1.6691910076360728e-08,False,False,False,True,"[0, 0, 3436]"
+21_act_silu,"[1, 6, 14336]",1.1920928955078125e-07,7.562669934735311e-10,False,False,False,True,"[0, 0, 3436]"
+22_down_proj,"[1, 6, 4096]",2.9802322387695312e-08,7.38464400740213e-10,False,False,True,True,"[0, 0, 3964]"
+23_layer0_output,"[1, 6, 4096]",2.9802322387695312e-08,8.920377769783272e-10,False,False,True,True,"[0, 0, 415]"
