@@ -439,5 +439,7 @@
       "reason": "model check 미활성 (--enable-model-check 필요, vast.ai 전용)"
     }
   },
-  "all_invariants_passed": true
+  "local_smoke_gate_passed": true,
+  "step_03_final_gate_passed": false,
+  "all_invariants_passed": false
 }

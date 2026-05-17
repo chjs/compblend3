@@ -208,6 +208,36 @@ def check_3_3A_interface(dc_orig: DynamicCache, dc_round: DynamicCache,
     return {"passed": passed, "checks": checks}
 
 
+def _compare_dc_kv(d1: DynamicCache, d2: DynamicCache, n_layers: int) -> dict:
+    """두 DynamicCache의 K/V layer별 bitwise + seq_len 비교 (read-only)."""
+    mismatched: list[int] = []
+    for i in range(n_layers):
+        k_eq = bool(torch.equal(d1.key_cache[i], d2.key_cache[i]))
+        v_eq = bool(torch.equal(d1.value_cache[i], d2.value_cache[i]))
+        if not (k_eq and v_eq):
+            mismatched.append(i)
+    return {
+        "bitwise": len(mismatched) == 0,
+        "mismatched_layers": mismatched,
+        "seq_len_a": d1.get_seq_length(),
+        "seq_len_b": d2.get_seq_length(),
+        "seq_len_match": d1.get_seq_length() == d2.get_seq_length(),
+    }
+
+
+def _classify_3_3b_failure(diag: dict) -> str:
+    """3.3B failure case 자동 판정 (PASS면 빈 문자열)."""
+    if diag.get("logits_sha_match"):
+        return ""
+    pao = diag.get("prefill_a_vs_orig", {})
+    orw = diag.get("orig_vs_round", {})
+    if not pao.get("bitwise", True):
+        return "Case 1: prefill A·orig 결정론 실패 (ChunkedKVStore 무관)"
+    if not orw.get("bitwise", True):
+        return "Case 2: ChunkedKVStore 저장/복원 손실"
+    return "Case 3: K/V는 bitwise이나 decode logits 불일치 (forward 인자/인터페이스)"
+
+
 def check_3_3B_model_forward(model_id: str) -> dict:
     """3.3B: 모델 forward 시 logits SHA-256 일치 (vast.ai GPU 전용).
 
@@ -218,11 +248,18 @@ def check_3_3B_model_forward(model_id: str) -> dict:
       4) decode A: model(next_token, past_key_values=D_A) → logits_A
       5) decode B: model(next_token, past_key_values=D_round) → logits_B
       6) sha256(logits_A) == sha256(logits_B)
+
+    Diagnostic fields (PASS·FAIL 모두 채움):
+      - prefill_a_vs_orig: D_A vs D_orig bitwise (결정론 sanity)
+      - orig_vs_round:    D_orig vs D_round bitwise (ChunkedKVStore 저장/복원 sanity)
+      - failure_case:     case 1~3 자동 판정 (PASS면 "")
+      - env: torch / transformers / cuda / device / dtype / attn impl
     """
     if not torch.cuda.is_available():
         return {"passed": None, "skipped": True,
                 "reason": "CUDA unavailable (model check requires GPU)"}
 
+    import transformers as _tx
     from transformers import AutoTokenizer
     from compblend.modeling import MistralForCausalLM
 
@@ -265,7 +302,15 @@ def check_3_3B_model_forward(model_id: str) -> dict:
             is_cacheable=True,
             is_permanent_hit=(i == 0),
         ))
+    n_layers = len(d_orig.key_cache)
     d_round = ChunkedKVStore.from_dynamic_cache(d_orig, chunk_spec).to_dynamic_cache()
+
+    # --- decode 전 sanity (read-only K/V 비교) ---
+    pao = _compare_dc_kv(d_a, d_orig, n_layers)        # decode로 d_a/d_orig mutate 전
+    orw = _compare_dc_kv(d_orig, d_round, n_layers)
+    seq_a_pre, seq_o_pre, seq_r_pre = (
+        d_a.get_seq_length(), d_orig.get_seq_length(), d_round.get_seq_length()
+    )
 
     # (4)/(5) decode A·B (option E 패턴 — attention_mask + cache_position 명시)
     decode_attn = torch.ones((1, T + 1), dtype=torch.long, device="cuda")
@@ -277,24 +322,49 @@ def check_3_3B_model_forward(model_id: str) -> dict:
         dec_b = model(input_ids=next_token_id, past_key_values=d_round,
                        attention_mask=decode_attn, cache_position=decode_cp,
                        use_cache=True)
-    logits_a = dec_a.logits[:, -1, :].detach().to("cpu", torch.float32)
-    logits_b = dec_b.logits[:, -1, :].detach().to("cpu", torch.float32)
+    logits_a_full = dec_a.logits.detach().to("cpu", torch.float32)
+    logits_b_full = dec_b.logits.detach().to("cpu", torch.float32)
+    logits_a = logits_a_full[:, -1, :]
+    logits_b = logits_b_full[:, -1, :]
 
     sha_a = tensor_sha256(logits_a)
     sha_b = tensor_sha256(logits_b)
-    max_abs = float((logits_a - logits_b).abs().max())
-    return {
+    max_abs = float((logits_a_full - logits_b_full).abs().max())
+    mean_abs = float((logits_a_full - logits_b_full).abs().mean())
+
+    diag: dict[str, Any] = {
         "passed": sha_a == sha_b,
         "skipped": False,
         "gate": "sha256(logits_a) == sha256(logits_b)",
+        "logits_sha_match": sha_a == sha_b,
         "logits_a_sha256": sha_a,
         "logits_b_sha256": sha_b,
         "max_abs_diff": max_abs,
+        "mean_abs_diff": mean_abs,
         "decode_token_id": next_id_int,
         "decode_token_decoded": tokenizer.decode([next_id_int]),
         "n_chunks": len(chunk_spec),
         "prefix_length": T,
+        # decode 전 sanity (read-only K/V 비교; failure case 1·2 자동 판정용)
+        "prefill_a_vs_orig": pao,
+        "orig_vs_round": orw,
+        "seq_len_a_pre_decode": seq_a_pre,
+        "seq_len_orig_pre_decode": seq_o_pre,
+        "seq_len_round_pre_decode": seq_r_pre,
+        "seq_len_match_all": (seq_a_pre == seq_o_pre == seq_r_pre),
+        # decode 호출 인자
+        "attention_mask_shape_decode": list(decode_attn.shape),
+        "cache_position_decode": decode_cp.cpu().tolist(),
+        # env
+        "torch_version": torch.__version__,
+        "transformers_version": _tx.__version__,
+        "cuda_version": torch.version.cuda,
+        "cuda_device_name": torch.cuda.get_device_name(0),
+        "model_dtype": str(model.dtype),
+        "attention_implementation": getattr(model.config, "_attn_implementation", None),
     }
+    diag["failure_case"] = _classify_3_3b_failure(diag)
+    return diag
 
 
 def main() -> None:
@@ -333,10 +403,14 @@ def main() -> None:
                    "reason": "model check 미활성 (--enable-model-check 필요, vast.ai 전용)"}
 
     print(f"[5/5] summary 작성")
-    # gate: 3.1 + 3.2 + 3.3A 필수, 3.3B는 활성 시 필수
-    gate_pass = r_3_1["passed"] and r_3_2["passed"] and r_3_3a["passed"]
-    if args.enable_model_check:
-        gate_pass = gate_pass and bool(r_3_3b["passed"])
+    # Gate 분리 (hygiene): local smoke (3.1·3.2·3.3A) vs Step 3 final (+ 3.3B PASS).
+    local_smoke_gate_passed = bool(
+        r_3_1["passed"] and r_3_2["passed"] and r_3_3a["passed"]
+    )
+    step_03_final_gate_passed = bool(
+        local_smoke_gate_passed and (r_3_3b.get("passed") is True)
+    )
+    # all_invariants_passed = step_03_final_gate_passed (final 의미로 통일)
 
     summary = {
         "step": 3,
@@ -356,7 +430,9 @@ def main() -> None:
             "3.3A_cache_interface_compat":      r_3_3a,
             "3.3B_model_forward_logits_equiv":  r_3_3b,
         },
-        "all_invariants_passed": gate_pass,
+        "local_smoke_gate_passed": local_smoke_gate_passed,
+        "step_03_final_gate_passed": step_03_final_gate_passed,
+        "all_invariants_passed": step_03_final_gate_passed,
     }
     out_file = out_dir / "summary.json"
     out_file.write_text(json.dumps(summary, indent=2, ensure_ascii=False))
@@ -374,10 +450,20 @@ def main() -> None:
     else:
         print(f"  3.3B (model forward logits):        {'✅' if r_3_3b['passed'] else '❌'}"
               f"  max_abs={r_3_3b.get('max_abs_diff')}")
-    if gate_pass:
-        print("==> gate PASS")
+        if r_3_3b.get("failure_case"):
+            print(f"        failure_case: {r_3_3b['failure_case']}")
+
+    # 3 분기 콘솔 출력 (사용자 spec)
+    if not args.enable_model_check and local_smoke_gate_passed:
+        print("==> local smoke gate PASS; Step 3 final gate pending (3.3B skipped)")
+    elif args.enable_model_check and step_03_final_gate_passed:
+        print("==> Step 3 final gate PASS")
+    elif args.enable_model_check and not step_03_final_gate_passed:
+        print("==> Step 3 final gate FAIL")
+        sys.exit(1)
     else:
-        print("==> gate FAIL")
+        # local smoke 자체 실패 (3.1/3.2/3.3A 중 어느 하나 FAIL)
+        print("==> local smoke gate FAIL")
         sys.exit(1)
 
 
