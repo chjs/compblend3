@@ -7,11 +7,12 @@
 
 ## 현재 상태
 
-**Phase**: Phase 1 (Step 0~3) — Step 3 merge·tag 완료. Phase 1 종결. Phase 2 (Step 4~6) 진입 준비
-**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 (tag `step_02_done`) ✅ + Step 3 (tag `step_03_done`) ✅
-**Next**: Step 4 진입 (작업 0 chunk padding 정책 검증, DECISIONS §13 v13 사전 가정 확정)
-**Next task file**: `tasks/step_04_*.md` (현재 stub — 진입 전 확장)
-**Branch**: `main` (Step 4 진입 시 step/step_04_* 브랜치 신설)
+**Phase**: Phase 2·3 종결 (overnight round). Phase 4 (Step 8 Loong F1) 진입 전 사용자 결정 대기 (HKVD formula 확정)
+**완료**: Phase 0 전체 ✅ + Step 0~7 모두 tag 완료 (`step_00_done` ~ `step_07_done`) ✅
+**Step 7 노트**: HKVD formula는 CC 자율 채택 (per-token L2 + mean aggregation + ascending tie-break). Step 8 진입 전 사용자 검토 필요.
+**Next**: 내일 아침 사용자 리뷰 → `docs/reports/overnight_step_03_to_07_summary.md` 참조. HKVD formula 확정 후 Step 8 진입.
+**Next task file**: `tasks/step_08_*.md` (현재 stub — Step 7 HKVD 정의 확정 후 확장)
+**Branch**: `main`
 
 ---
 
@@ -20,10 +21,10 @@
 | Phase | 상태 | 비고 |
 |---|---|---|
 | **Phase 0** — 환경 셋업 | ✅ 완료 | MacBook venv ✅ + LMCache pinning ✅ + 사용자 리뷰 승인 (2026-05-14). vast.ai 셋업은 Step 0 작업 중 (Phase 0-B) |
-| Phase 1 — Step 0~3 (HF forward + cache) | 🔵 진행 중 | Step 0·1·2 tag 완료, Step 3 final gate PASS + report 작성 완료, 사용자 리뷰 후 merge/tag 대기 |
-| Phase 2 — Step 4~6 (CacheBlend 핵심) | ⬜ 대기 | |
-| Phase 3 — Step 7 (HKVD) | ⬜ 대기 | |
-| Phase 4 — Step 8 (Mistral F1) | ⬜ 대기 | |
+| Phase 1 — Step 0~3 (HF forward + cache) | ✅ 완료 | Step 0~3 tag 완료 |
+| Phase 2 — Step 4~6 (CacheBlend 핵심) | ✅ 완료 | Step 4~6 tag 완료 (overnight 2026-05-18) |
+| Phase 3 — Step 7 (HKVD) | ✅ 완료 | Step 7 tag 완료. HKVD formula는 CC 자율 채택 — Step 8 진입 전 사용자 검토 |
+| Phase 4 — Step 8 (Mistral F1) | ⬜ 대기 | HKVD formula 확정 후 진입 |
 | Phase 5 — Llama-3.1-8B 일반화 | ⬜ 대기 | |
 | Phase 6 — flash-attn 2 전환 | ⬜ 대기 | |
 | Phase 7 — KVzip 통합 | ⬜ 대기 | |
@@ -107,17 +108,15 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 ## 다음 행동 (Next actions)
 
-Step 3 final gate PASS 완료 + 보고서 작성 완료. 남은 것:
+Overnight round (2026-05-17 → 2026-05-18) 완료: Step 3 finalization + Step 4·5·6·7 모두 final gate PASS + merge + tag. 남은 것:
 
-1. **사용자 리뷰** — `docs/reports/step_03_chunked_kv_store_report.md` 검토 (GitHub)
-2. 승인 시: `git checkout main && git merge --no-ff step/step_03_chunked_kv_store` → `git tag step_03_done` → `git push origin main step_03_done` → step 브랜치 삭제 (로컬+원격)
-3. Step 4 진입 — 작업 0 (CacheBlend chunk padding 정책 검증, DECISIONS §13 v13 사전 가정 확정)
-
-별도 round 보류: 다른 진단 스크립트의 RoPE hook 첫 call 캡처 defect.
+1. **사용자 리뷰** — `docs/reports/overnight_step_03_to_07_summary.md` 우선, 이어서 각 step report
+2. **🔴 HKVD formula 확정** — Step 7의 CC 자율 채택 정의를 CacheBlend paper 원문과 비교 후 확정
+3. Step 8 진입 결정 — formula 확정 + Loong dataset 통합 환경 검토
 
 ## 다음 세션 첫 행동
 
-- Step 3 사용자 리뷰 대기. 승인 시 §7.1 절차 (`main --no-ff` merge + tag `step_03_done` + 브랜치 삭제) → Step 4 작업 0 (chunk padding 정책 검증) 진입.
+- `docs/reports/overnight_step_03_to_07_summary.md` 읽기 → HKVD formula 확정 → Step 8 task 파일 확장 → 진입.
 
 ---
 
