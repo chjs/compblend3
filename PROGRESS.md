@@ -21,7 +21,7 @@
 | Phase | 상태 | 비고 |
 |---|---|---|
 | **Phase 0** — 환경 셋업 | ✅ 완료 | MacBook venv ✅ + LMCache pinning ✅ + 사용자 리뷰 승인 (2026-05-14). vast.ai 셋업은 Step 0 작업 중 (Phase 0-B) |
-| Phase 1 — Step 0~3 (HF forward + cache) | 🔵 진행 중 | Step 0 진행 중 |
+| Phase 1 — Step 0~3 (HF forward + cache) | 🔵 진행 중 | Step 0·1·2 tag 완료, Step 3 final gate PASS + report 작성 완료, 사용자 리뷰 후 merge/tag 대기 |
 | Phase 2 — Step 4~6 (CacheBlend 핵심) | ⬜ 대기 | |
 | Phase 3 — Step 7 (HKVD) | ⬜ 대기 | |
 | Phase 4 — Step 8 (Mistral F1) | ⬜ 대기 | |
@@ -39,9 +39,9 @@
 | Step | 목표 | 상태 | Report | 결과 |
 |---|---|---|---|---|
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
-| 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | 🔵 | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
-| 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | 🔵 | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌), 리뷰 대기 |
-| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | 🔵 | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0), 리뷰 대기 |
+| 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | ✅ | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅ (tag step_01_done) |
+| 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | ✅ | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌) (tag step_02_done) |
+| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | 🔵 | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0), 사용자 리뷰 후 merge/tag 대기 |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
 | 6 | N chunks reuse, recompute_ratio=1.0 = vanilla | ⬜ | - | - |
