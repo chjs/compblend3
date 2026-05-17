@@ -1,0 +1,368 @@
+{
+  "step": 7,
+  "env_tag": "macbook",
+  "torch_version": "2.10.0",
+  "numpy_version": "1.26.4",
+  "invariants": {
+    "7.1_score_torch_eq_oracle": {
+      "passed": true,
+      "gate": "atol 1e-05",
+      "per_case": [
+        {
+          "shape": [
+            32,
+            8,
+            6,
+            128
+          ],
+          "per_layer_within_atol": true,
+          "aggregated_within_atol": true,
+          "per_layer_max_abs": 1.9073486328125e-06,
+          "aggregated_max_abs": 3.814697265625e-06
+        },
+        {
+          "shape": [
+            4,
+            4,
+            16,
+            64
+          ],
+          "per_layer_within_atol": true,
+          "aggregated_within_atol": true,
+          "per_layer_max_abs": 1.9073486328125e-06,
+          "aggregated_max_abs": 1.9073486328125e-06
+        },
+        {
+          "shape": [
+            2,
+            2,
+            64,
+            32
+          ],
+          "per_layer_within_atol": true,
+          "aggregated_within_atol": true,
+          "per_layer_max_abs": 9.5367431640625e-07,
+          "aggregated_max_abs": 9.5367431640625e-07
+        }
+      ]
+    },
+    "7.2_indices_torch_eq_oracle": {
+      "passed": true,
+      "gate": "list equality",
+      "n_cases": 15,
+      "per_case": [
+        {
+          "T": 6,
+          "ratio": 0.0,
+          "match": true,
+          "k_torch": 0,
+          "k_oracle": 0,
+          "idx_torch_first5": [],
+          "idx_oracle_first5": []
+        },
+        {
+          "T": 6,
+          "ratio": 0.25,
+          "match": true,
+          "k_torch": 2,
+          "k_oracle": 2,
+          "idx_torch_first5": [
+            3,
+            1
+          ],
+          "idx_oracle_first5": [
+            3,
+            1
+          ]
+        },
+        {
+          "T": 6,
+          "ratio": 0.5,
+          "match": true,
+          "k_torch": 3,
+          "k_oracle": 3,
+          "idx_torch_first5": [
+            3,
+            1,
+            0
+          ],
+          "idx_oracle_first5": [
+            3,
+            1,
+            0
+          ]
+        },
+        {
+          "T": 6,
+          "ratio": 0.75,
+          "match": true,
+          "k_torch": 5,
+          "k_oracle": 5,
+          "idx_torch_first5": [
+            3,
+            1,
+            0,
+            5,
+            4
+          ],
+          "idx_oracle_first5": [
+            3,
+            1,
+            0,
+            5,
+            4
+          ]
+        },
+        {
+          "T": 6,
+          "ratio": 1.0,
+          "match": true,
+          "k_torch": 6,
+          "k_oracle": 6,
+          "idx_torch_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "idx_oracle_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "T": 16,
+          "ratio": 0.0,
+          "match": true,
+          "k_torch": 0,
+          "k_oracle": 0,
+          "idx_torch_first5": [],
+          "idx_oracle_first5": []
+        },
+        {
+          "T": 16,
+          "ratio": 0.25,
+          "match": true,
+          "k_torch": 4,
+          "k_oracle": 4,
+          "idx_torch_first5": [
+            2,
+            4,
+            10,
+            6
+          ],
+          "idx_oracle_first5": [
+            2,
+            4,
+            10,
+            6
+          ]
+        },
+        {
+          "T": 16,
+          "ratio": 0.5,
+          "match": true,
+          "k_torch": 8,
+          "k_oracle": 8,
+          "idx_torch_first5": [
+            2,
+            4,
+            10,
+            6,
+            1
+          ],
+          "idx_oracle_first5": [
+            2,
+            4,
+            10,
+            6,
+            1
+          ]
+        },
+        {
+          "T": 16,
+          "ratio": 0.75,
+          "match": true,
+          "k_torch": 12,
+          "k_oracle": 12,
+          "idx_torch_first5": [
+            2,
+            4,
+            10,
+            6,
+            1
+          ],
+          "idx_oracle_first5": [
+            2,
+            4,
+            10,
+            6,
+            1
+          ]
+        },
+        {
+          "T": 16,
+          "ratio": 1.0,
+          "match": true,
+          "k_torch": 16,
+          "k_oracle": 16,
+          "idx_torch_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "idx_oracle_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "T": 64,
+          "ratio": 0.0,
+          "match": true,
+          "k_torch": 0,
+          "k_oracle": 0,
+          "idx_torch_first5": [],
+          "idx_oracle_first5": []
+        },
+        {
+          "T": 64,
+          "ratio": 0.25,
+          "match": true,
+          "k_torch": 16,
+          "k_oracle": 16,
+          "idx_torch_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ],
+          "idx_oracle_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ]
+        },
+        {
+          "T": 64,
+          "ratio": 0.5,
+          "match": true,
+          "k_torch": 32,
+          "k_oracle": 32,
+          "idx_torch_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ],
+          "idx_oracle_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ]
+        },
+        {
+          "T": 64,
+          "ratio": 0.75,
+          "match": true,
+          "k_torch": 48,
+          "k_oracle": 48,
+          "idx_torch_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ],
+          "idx_oracle_first5": [
+            50,
+            8,
+            48,
+            21,
+            57
+          ]
+        },
+        {
+          "T": 64,
+          "ratio": 1.0,
+          "match": true,
+          "k_torch": 64,
+          "k_oracle": 64,
+          "idx_torch_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "idx_oracle_first5": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "7.3_tiebreak_deterministic": {
+      "passed": true,
+      "gate": "tie-break ascending index",
+      "score": [
+        1.0,
+        1.0,
+        0.5,
+        0.5,
+        0.5,
+        0.10000000149011612
+      ],
+      "ratio": 0.5,
+      "expected": [
+        0,
+        1,
+        2
+      ],
+      "torch_actual": [
+        0,
+        1,
+        2
+      ],
+      "oracle_actual": [
+        0,
+        1,
+        2
+      ]
+    },
+    "7.4_shape_generalization": {
+      "passed": true,
+      "note": "7.1·7.2가 multiple shapes/ratios 모두 다룸"
+    },
+    "7.5_invalid_input_validation": {
+      "passed": true,
+      "gate": "assertion raised on invalid",
+      "checks": {
+        "ratio_neg_rejected": true,
+        "ratio_gt1_rejected": true,
+        "shape_mismatch_rejected": true
+      }
+    }
+  },
+  "step_07_final_gate_passed": true,
+  "all_invariants_passed": true,
+  "hkvd_definition_note": "CC autonomous choice: per-token, per-layer L2 norm of K deviation. Mean aggregation. tie-break ascending. See task §2 / §11."
+}

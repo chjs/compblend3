@@ -44,7 +44,7 @@
 | 4 | N chunks 따로 prefill → concat (RoPE re-rotation) | ✅ | step_04_multi_chunk_concat_report.md | 4.1 atol 1e-6 / 4.2 bitwise / 4.3 measurement (drift max=8.46) (tag step_04_done) |
 | 5 | 1 chunk reuse = vanilla | ✅ | step_05_one_chunk_reuse_report.md | 5.1·5.2·5.3·5.4 모두 bitwise PASS (tag step_05_done) |
 | 6 | N chunks reuse, recompute_ratio=1.0 = vanilla | ✅ | step_06_n_chunks_reuse_full_recompute_report.md | API contract + 6.1 bitwise PASS (max_abs=0.0) (tag step_06_done) |
-| 7 | HKVD oracle 일치 | ⬜ | - | - |
+| 7 | HKVD oracle 일치 | ✅ | step_07_hkvd_oracle_report.md | 7.1·7.2·7.3·7.4·7.5 PASS (MacBook CPU, vast.ai 사용 ❌). HKVD formula는 CC 자율 채택, Step 8 진입 전 사용자 검토 권장 (tag step_07_done) |
 | 8 | Loong F1 측정 (Mistral) | ⬜ | - | - |
 
 ---
