@@ -1,0 +1,35 @@
+{
+  "step": 6,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0+cu128",
+  "model_check_enabled": true,
+  "invariants": {
+    "api_contract_ratio_lt_1_raises": {
+      "passed": true,
+      "raised": "NotImplementedError",
+      "msg": "Step 6 scope = recompute_ratio=1.0 only. got 0.5. Selective recompute (HKVD) 은 S"
+    },
+    "6.1_full_recompute_eq_vanilla": {
+      "passed": true,
+      "gate": "sha256 logits equality",
+      "logits_blend_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+      "logits_vanilla_sha256": "d338ec6a350dc6d7f81307c1479737cde13e7740d78ecf360b93ce4d23573c0b",
+      "max_abs_diff": 0.0,
+      "n_chunks": 3,
+      "chunk_T": 2,
+      "prefix_length": 6,
+      "recompute_ratio": 1.0,
+      "env": {
+        "torch": "2.10.0+cu128",
+        "transformers": "4.51.3",
+        "cuda": "12.8",
+        "device": "NVIDIA A100-SXM4-80GB"
+      }
+    }
+  },
+  "local_smoke_gate_passed": true,
+  "step_06_final_gate_passed": true,
+  "all_invariants_passed": true
+}
