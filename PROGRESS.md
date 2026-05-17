@@ -41,7 +41,7 @@
 | 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | ✅ | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅ (tag step_01_done) |
 | 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | ✅ | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌) (tag step_02_done) |
 | 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | ✅ | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0) (tag step_03_done) |
-| 4 | N chunks 따로 prefill → concat (RoPE re-rotation) | 🔵 | step_04_multi_chunk_concat_report.md | 4.1 atol 1e-6 PASS / 4.2 bitwise PASS / 4.3 measurement (drift max=8.46). step_04_final_gate PASS |
+| 4 | N chunks 따로 prefill → concat (RoPE re-rotation) | ✅ | step_04_multi_chunk_concat_report.md | 4.1 atol 1e-6 / 4.2 bitwise / 4.3 measurement (drift max=8.46) (tag step_04_done) |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
 | 6 | N chunks reuse, recompute_ratio=1.0 = vanilla | ⬜ | - | - |
 | 7 | HKVD oracle 일치 | ⬜ | - | - |
