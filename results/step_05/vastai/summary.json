@@ -1,0 +1,88 @@
+{
+  "step": 5,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0+cu128",
+  "model_check_enabled": true,
+  "shapes": {
+    "B": 1,
+    "H_kv": 8,
+    "D": 128,
+    "num_layers": 32,
+    "T_total": 6
+  },
+  "invariants": {
+    "5.1_one_chunk_roundtrip": {
+      "passed": true,
+      "gate": "torch.equal",
+      "n_layers": 32,
+      "mismatched_layers": [],
+      "seq_orig": 6,
+      "seq_round": 6
+    },
+    "5.2_decode_logits_equiv": {
+      "passed": true,
+      "gate": "sha256 logits equality",
+      "logits_a_sha256": "e581d7f715cffb6377e63d8f19d97af3ba1b1e2a9ed2817e1730539694172c18",
+      "logits_b_sha256": "e581d7f715cffb6377e63d8f19d97af3ba1b1e2a9ed2817e1730539694172c18",
+      "max_abs_diff": 0.0,
+      "decode_token_id": 5465,
+      "decode_token_decoded": "Paris",
+      "prefix_length": 6,
+      "n_chunks": 1,
+      "env": {
+        "torch": "2.10.0+cu128",
+        "transformers": "4.51.3",
+        "cuda": "12.8",
+        "device": "NVIDIA A100-SXM4-80GB"
+      }
+    },
+    "5.3_post_update_cache_equiv": {
+      "passed": true,
+      "gate": "torch.equal K/V[:T+1] per layer",
+      "n_layers": 32,
+      "T_after_decode": 7,
+      "mismatched_layers": [],
+      "per_layer": [
+        {
+          "layer": 0,
+          "k_match": true,
+          "v_match": true,
+          "k_max_abs": 0.0,
+          "v_max_abs": 0.0
+        },
+        {
+          "layer": 1,
+          "k_match": true,
+          "v_match": true,
+          "k_max_abs": 0.0,
+          "v_max_abs": 0.0
+        },
+        {
+          "layer": 2,
+          "k_match": true,
+          "v_match": true,
+          "k_max_abs": 0.0,
+          "v_max_abs": 0.0
+        },
+        {
+          "layer": 3,
+          "k_match": true,
+          "v_match": true,
+          "k_max_abs": 0.0,
+          "v_max_abs": 0.0
+        }
+      ]
+    },
+    "5.4_chunk_meta_equality": {
+      "passed": true,
+      "mismatched": [],
+      "n_chunks_input": 1,
+      "n_chunks_stored": 1
+    }
+  },
+  "local_smoke_gate_passed": true,
+  "step_05_final_gate_passed": true,
+  "all_invariants_passed": true
+}
