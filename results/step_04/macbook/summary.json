@@ -1,0 +1,89 @@
+{
+  "step": 4,
+  "env_tag": "macbook",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0",
+  "model_check_enabled": false,
+  "shapes": {
+    "B": 1,
+    "H_kv": 8,
+    "D": 128,
+    "num_layers": 32
+  },
+  "invariants": {
+    "4.1_rope_re_rotation_self_consistency": {
+      "passed": true,
+      "gate": "atol 1e-06 (fp32 RoPE composition noise floor)",
+      "atol_threshold": 1e-06,
+      "per_case": [
+        {
+          "old_start": 0,
+          "new_start": 0,
+          "T": 4,
+          "bitwise": true,
+          "within_atol_1e-6": true,
+          "max_abs": 0.0
+        },
+        {
+          "old_start": 0,
+          "new_start": 2,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 5.662441253662109e-07
+        },
+        {
+          "old_start": 0,
+          "new_start": 5,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 4.76837158203125e-07
+        },
+        {
+          "old_start": 3,
+          "new_start": 7,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 9.5367431640625e-07
+        },
+        {
+          "old_start": 2,
+          "new_start": 6,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 5.960464477539062e-07
+        }
+      ]
+    },
+    "4.2_chunked_store_reorder_concat": {
+      "passed": true,
+      "gate": "torch.equal vs expected new_offset-ordered concat",
+      "n_chunks": 3,
+      "chunk_T": 2,
+      "new_offsets_input": [
+        4,
+        0,
+        2
+      ],
+      "expected_order": [
+        "c1",
+        "c2",
+        "c0"
+      ],
+      "n_layers_compared": 32,
+      "mismatched_layers": []
+    },
+    "4.3_multi_chunk_vanilla_drift": {
+      "passed": null,
+      "skipped": true,
+      "reason": "model check 미활성 (--enable-model-check 필요)"
+    }
+  },
+  "local_smoke_gate_passed": true,
+  "step_04_final_gate_passed": true,
+  "all_invariants_passed": true
+}

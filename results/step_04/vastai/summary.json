@@ -1,0 +1,132 @@
+{
+  "step": 4,
+  "env_tag": "vastai",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0+cu128",
+  "model_check_enabled": true,
+  "shapes": {
+    "B": 1,
+    "H_kv": 8,
+    "D": 128,
+    "num_layers": 32
+  },
+  "invariants": {
+    "4.1_rope_re_rotation_self_consistency": {
+      "passed": true,
+      "gate": "atol 1e-06 (fp32 RoPE composition noise floor)",
+      "atol_threshold": 1e-06,
+      "per_case": [
+        {
+          "old_start": 0,
+          "new_start": 0,
+          "T": 4,
+          "bitwise": true,
+          "within_atol_1e-6": true,
+          "max_abs": 0.0
+        },
+        {
+          "old_start": 0,
+          "new_start": 2,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 5.662441253662109e-07
+        },
+        {
+          "old_start": 0,
+          "new_start": 5,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 4.76837158203125e-07
+        },
+        {
+          "old_start": 3,
+          "new_start": 7,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 7.152557373046875e-07
+        },
+        {
+          "old_start": 2,
+          "new_start": 6,
+          "T": 4,
+          "bitwise": false,
+          "within_atol_1e-6": true,
+          "max_abs": 5.960464477539062e-07
+        }
+      ]
+    },
+    "4.2_chunked_store_reorder_concat": {
+      "passed": true,
+      "gate": "torch.equal vs expected new_offset-ordered concat",
+      "n_chunks": 3,
+      "chunk_T": 2,
+      "new_offsets_input": [
+        4,
+        0,
+        2
+      ],
+      "expected_order": [
+        "c1",
+        "c2",
+        "c0"
+      ],
+      "n_layers_compared": 32,
+      "mismatched_layers": []
+    },
+    "4.3_multi_chunk_vanilla_drift": {
+      "passed": null,
+      "skipped": false,
+      "gate": "measurement only (drift_budget_exceeded = max_abs > 1e-2)",
+      "n_chunks": 3,
+      "chunk_T": 2,
+      "prefix_length": 6,
+      "decode_token_id_vanilla": 5465,
+      "decode_token_decoded_vanilla": "Paris",
+      "vanilla_argmax": 28725,
+      "blended_argmax": 28725,
+      "argmax_match": true,
+      "top5_overlap_k5": 3,
+      "max_abs_diff": 8.461740493774414,
+      "mean_abs_diff": 0.9930092096328735,
+      "drift_budget_threshold": 0.01,
+      "drift_budget_exceeded": true,
+      "per_chunk_layer0_k_check": [
+        {
+          "chunk_id": "c0",
+          "new_offset": 0,
+          "layer0_k_bitwise": true,
+          "layer0_k_max_abs": 0.0
+        },
+        {
+          "chunk_id": "c1",
+          "new_offset": 2,
+          "layer0_k_bitwise": false,
+          "layer0_k_max_abs": 1.1674269437789917
+        },
+        {
+          "chunk_id": "c2",
+          "new_offset": 4,
+          "layer0_k_bitwise": false,
+          "layer0_k_max_abs": 2.248976230621338
+        }
+      ],
+      "logits_vanilla_sha256_last": "e581d7f715cffb6377e63d8f19d97af3ba1b1e2a9ed2817e1730539694172c18",
+      "logits_blended_sha256_last": "7bce3e00c9cda25f4e10ae2fe47ead20cfccce3bf40a69c7fcc652a329903649",
+      "env": {
+        "torch_version": "2.10.0+cu128",
+        "transformers_version": "4.51.3",
+        "cuda_version": "12.8",
+        "cuda_device_name": "NVIDIA A100-SXM4-80GB",
+        "model_dtype": "torch.float32",
+        "attention_implementation": "eager"
+      }
+    }
+  },
+  "local_smoke_gate_passed": true,
+  "step_04_final_gate_passed": true,
+  "all_invariants_passed": true
+}
