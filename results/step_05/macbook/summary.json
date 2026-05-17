@@ -1,0 +1,44 @@
+{
+  "step": 5,
+  "env_tag": "macbook",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "transformers_version": "4.51.3",
+  "torch_version": "2.10.0",
+  "model_check_enabled": false,
+  "shapes": {
+    "B": 1,
+    "H_kv": 8,
+    "D": 128,
+    "num_layers": 32,
+    "T_total": 6
+  },
+  "invariants": {
+    "5.1_one_chunk_roundtrip": {
+      "passed": true,
+      "gate": "torch.equal",
+      "n_layers": 32,
+      "mismatched_layers": [],
+      "seq_orig": 6,
+      "seq_round": 6
+    },
+    "5.2_decode_logits_equiv": {
+      "passed": null,
+      "skipped": true,
+      "reason": "model check 미활성"
+    },
+    "5.3_post_update_cache_equiv": {
+      "passed": null,
+      "skipped": true,
+      "reason": "model check 미활성"
+    },
+    "5.4_chunk_meta_equality": {
+      "passed": true,
+      "mismatched": [],
+      "n_chunks_input": 1,
+      "n_chunks_stored": 1
+    }
+  },
+  "local_smoke_gate_passed": true,
+  "step_05_final_gate_passed": false,
+  "all_invariants_passed": false
+}
