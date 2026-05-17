@@ -7,11 +7,12 @@
 
 ## 현재 상태
 
-**Phase**: Phase 1 (Step 0~3) — Step 3 진입 (task 확장 + 코드 + MacBook smoke 통과, vast.ai 실행 대기)
+**Phase**: Phase 1 (Step 0~3) — Step 3 실험 통과 (final gate PASS), 보고서 작성 완료, 사용자 리뷰 대기
 **완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 (tag `step_02_done`) ✅
-**진행 중**: Step 3 — `src/compblend/cache.py` (ChunkedKVStore 신규) + 검증 스크립트 + task 확장. MacBook smoke 3.1·3.2·3.3A PASS. 3.3B는 vast.ai 별도 round
-**Next task file**: `tasks/step_03_chunked_kv_store.md` (자체완결 확장 완료)
-**Branch**: `step/step_03_chunked_kv_store` (active)
+**Step 3 실험 상태**: invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅, `step_03_final_gate_passed=true`, `all_invariants_passed=true`. `main` merge·tag·브랜치 삭제는 사용자 리뷰 후 별도 round
+**Next**: Step 3 사용자 리뷰 → 승인 시 §7.1 절차 → Step 4 진입 (작업 0 chunk padding 정책 검증)
+**Next task file**: `tasks/step_04_*.md` (현재 stub — 진입 전 확장 필요)
+**Branch**: `step/step_03_chunked_kv_store` (active, 리뷰 후 merge·삭제 예정)
 
 ---
 
@@ -40,7 +41,7 @@
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
 | 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | 🔵 | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅, 리뷰 대기 |
 | 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | 🔵 | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌), 리뷰 대기 |
-| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | 🔵 | - | MacBook smoke 3.1·3.2·3.3A PASS, 3.3B는 vast.ai 별도 round |
+| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | 🔵 | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0), 리뷰 대기 |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
 | 6 | N chunks reuse, recompute_ratio=1.0 = vanilla | ⬜ | - | - |
@@ -107,17 +108,17 @@ vast.ai 환경 검증 / sanity_forward / Loong manifest는 Phase 0 게이트가 
 
 ## 다음 행동 (Next actions)
 
-Step 3 task 확장 + 코드 + MacBook smoke 통과 (3.1·3.2·3.3A). 남은 것:
+Step 3 final gate PASS 완료 + 보고서 작성 완료. 남은 것:
 
-1. **vast.ai 실행 (별도 round 승인)** — 3.3B (모델 forward logits SHA-256 일치) 검증. 인스턴스 할당 → `python tasks/step_03_chunked_kv_store/run_chunked_kv_store_check.py --out results/step_03/vastai/ --enable-model-check` → 결과 회수 → destroy
-2. 보고서 작성 (`docs/reports/step_03_chunked_kv_store_report.md`) → 사용자 리뷰
-3. 승인 시 §7.1 절차: `main --no-ff` merge + tag `step_03_done` + step 브랜치 삭제
+1. **사용자 리뷰** — `docs/reports/step_03_chunked_kv_store_report.md` 검토 (GitHub)
+2. 승인 시: `git checkout main && git merge --no-ff step/step_03_chunked_kv_store` → `git tag step_03_done` → `git push origin main step_03_done` → step 브랜치 삭제 (로컬+원격)
+3. Step 4 진입 — 작업 0 (CacheBlend chunk padding 정책 검증, DECISIONS §13 v13 사전 가정 확정)
 
 별도 round 보류: 다른 진단 스크립트의 RoPE hook 첫 call 캡처 defect.
 
 ## 다음 세션 첫 행동
 
-- Step 3 vast.ai 실행 round 승인 대기. 승인 시 3.3B 검증 + 결과 회수 → 보고서 작성.
+- Step 3 사용자 리뷰 대기. 승인 시 §7.1 절차 (`main --no-ff` merge + tag `step_03_done` + 브랜치 삭제) → Step 4 작업 0 (chunk padding 정책 검증) 진입.
 
 ---
 
@@ -159,6 +160,8 @@ Step 3 task 확장 + 코드 + MacBook smoke 통과 (3.1·3.2·3.3A). 남은 것:
   - **옵션 B (2026-05-16 결정)**: 2.3A를 "padded forward(M=7, mask=[1*6,0], use_cache=True) vs single forward(M=7, mask=[1]*7, use_cache=True)의 DynamicCache K/V[:6] bitwise"로 재정의. Gate = `torch.equal`. 2.3B 신설(운영 split forward drift 측정, gate ❌). 둘 다 단일 forward + cache empty 시작 → attention shape `(Q=7, K=7)` 양쪽 동일 → same-shape bitwise 가능. mechanism justification은 task 파일 §2.3A에 명시.
   - **task 파일·script·DECISIONS 갱신**: `tasks/step_02_dynamic_cache.md` §2.3A 옵션 B 정의 + §2.3B 신설 + 의사 코드·Tensor shape·summary.json schema·보고서 가이드·솔직성 노트 갱신. `tasks/step_02_dynamic_cache/run_dynamic_cache_check.py` 재작성 (5 forward: a no-cache / b cache / c padded / d single / e operational split, forward hook ❌, K/V 직접 접근). DECISIONS.md §13 v13 (옵션 B 결정 + CacheBlend chunk padding 사전 가정). 누적 vast.ai 비용은 보고서 §3 환경에서 정산.
 - **2026-05-17 (Step 2 실험 + 보고서 작성)**: vast.ai A100-SXM4-80GB (instance `36876915`, dph_total `$1.21/h`, running 228초, 추정 비용 ~$0.16) 에서 옵션 B 검증 — **invariant 2.1·2.2·2.3A 모두 PASS** ✅ (32 layer × K/V `torch.equal` 통과, mismatched=[]). 2.3B drift 측정: `max_abs=6.20e-06`, `argmax_match=True`, `top5_overlap=5/5`, `drift_budget_exceeded=False`. decode 토큰 `5465="Paris"` (Step 0/1 일치). `all_invariants_passed=true`. 결과 commit `84e7d63`. 보고서 `docs/reports/step_02_dynamic_cache_report.md` 작성 (11 섹션) — §6 mechanism interpretation으로 옵션 B의 same-shape (Q=7, K=7) 구조와 prefill cache + padded decode 2-step 구조 (Q=7, K=13)의 구분 명시, §7 operational drift의 mechanism 정량화, §9 CacheBlend chunk padding 사전 메모와의 정합, §10에서 직전 작업 0의 K_total mismatch 분석 정정 명시. 사용자 리뷰 대기. Step 2 누적 vast.ai 비용 ~$1.0 추정 (옵션 A/E + C-3/C-4/C-6/C-7 + 본 실행), 정확 비용은 콘솔 참조.
-- **2026-05-17 (Step 2 merge + Step 3 진입)**: Step 2 사용자 리뷰 승인 → main `--no-ff` merge (`71f9c03`), tag `step_02_done`, 브랜치 삭제 (로컬+원격). Step 3 진입 — 작업 0 (사전 확인): HF Cache 인터페이스 surface 직접 확인 (5 abstract methods), modeling_mistral.py 호출 패턴 (`update`/`get_seq_length`/`get_max_cache_shape`/`isinstance(Cache)`), DECISIONS §3.8의 ChunkedKVStore 명세 그대로 채택. 별도 결정 2건: (a) drift_budget Step 3 미적용 (모든 invariant same-shape), (b) chunk padding 정책 Step 4 작업 0으로 이연. Step 3 scope β 채택 — invariant 4개 (3.1 + 3.2 + 3.3A + 3.3B). 해석 A 채택 — Cache 상속 ❌, dataclass-like container. 작업 1·2·3·4 일괄 처리: task 파일 stub → 자체완결 12 섹션 확장, `src/compblend/cache.py` 신규 (ChunkMeta + ChunkedKVStore), `tasks/step_03_chunked_kv_store/run_chunked_kv_store_check.py` 신규, MacBook smoke 3.1·3.2·3.3A PASS. branch `step/step_03_chunked_kv_store` 생성·commit·push. 3.3B는 vast.ai 별도 round 승인 대기.
+- **2026-05-17 (Step 2 merge + Step 3 진입)**: Step 2 사용자 리뷰 승인 → main `--no-ff` merge (`71f9c03`), tag `step_02_done`, 브랜치 삭제 (로컬+원격). Step 3 진입 — 작업 0 (사전 확인): HF Cache 인터페이스 surface 직접 확인 (5 abstract methods), modeling_mistral.py 호출 패턴 (`update`/`get_seq_length`/`get_max_cache_shape`/`isinstance(Cache)`), DECISIONS §3.8의 ChunkedKVStore 명세 그대로 채택. 별도 결정 2건: (a) drift_budget Step 3 미적용 (모든 invariant same-shape), (b) chunk padding 정책 Step 4 작업 0으로 이연. Step 3 scope β 채택 — invariant 4개 (3.1 + 3.2 + 3.3A + 3.3B). 해석 A 채택 — Cache 상속 ❌, dataclass-like container. 작업 1·2·3·4 일괄 처리: task 파일 stub → 자체완결 12 섹션 확장, `src/compblend/cache.py` 신규 (ChunkMeta + ChunkedKVStore), `tasks/step_03_chunked_kv_store/run_chunked_kv_store_check.py` 신규, MacBook smoke 3.1·3.2·3.3A PASS. branch `step/step_03_chunked_kv_store` 생성·commit·push (`e2f9c00`).
+- **2026-05-17 (Step 3 hygiene + 3.3B vast.ai)**: hygiene commit (`72d1b5b`) — summary.json gate 분리 (`local_smoke_gate_passed`·`step_03_final_gate_passed`·`all_invariants_passed`) + 콘솔 3분기 + 3.3B diagnostic 13 fields + `_classify_3_3b_failure` 자동 판정. 알고리즘 ❌ 수정. MacBook smoke 재실행 PASS. vast.ai A100-SXM4-80GB (instance `36936503`, dph_total `$1.21/h`, running 322초, 추정 비용 ~$0.15) 에서 3.3B 검증 — **invariant 3.1·3.2·3.3A·3.3B 모두 PASS** ✅, `step_03_final_gate_passed=True`, `all_invariants_passed=True`. `logits_a_sha256 == logits_b_sha256 = e581d7f715cffb63...`, `max_abs_diff=0.0`, `mean_abs_diff=0.0`. decode 토큰 `5465="Paris"` (Step 0/1/2 일치). `failure_case=""` (Case 1/2/3 모두 배제). 결과 commit `e9449f0`. 인스턴스 destroy, 잔존 0개.
+- **2026-05-17 (Step 3 보고서 작성)**: `docs/reports/step_03_chunked_kv_store_report.md` 작성 (12 섹션) — §1 Summary, §2 Goal/Scope, §3 Environment (vast.ai + MacBook + 누적 비용 추정 Step 0~3 ~$1.36), §4 Implementation overview (해석 A · 5-step 절차 · Tensor shape), §5 Invariants/Gates (4 invariant + 3 gate fields), §6 MacBook smoke, §7 vast.ai 3.3B (diagnostic fields + failure case 자동 판정), §8 Key findings (6건), §9 Mechanism interpretation (왜 3.3B가 bitwise인가 — 3.1 + 결정론 prefill의 derived guarantee), §10 Limitations (11건), §11 Step 4 implications (작업 0 chunk padding 정책 검증), §12 Artifacts/commits/next. 필수 영문 문장 3건 (Cache 상속 ❌ · drift budget 미적용 · RoPE/chunk padding 이연) §4.2 / §1·§8 / §2·§10 배치. summary.json source of truth 재확인 — 직전 보고와 충돌 없음. 사용자 리뷰 대기. `main` merge·tag·브랜치 삭제는 별도 round.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)
