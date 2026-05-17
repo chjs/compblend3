@@ -7,12 +7,11 @@
 
 ## 현재 상태
 
-**Phase**: Phase 1 (Step 0~3) — Step 3 실험 통과 (final gate PASS), 보고서 작성 완료, 사용자 리뷰 대기
-**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 (tag `step_02_done`) ✅
-**Step 3 실험 상태**: invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅, `step_03_final_gate_passed=true`, `all_invariants_passed=true`. `main` merge·tag·브랜치 삭제는 사용자 리뷰 후 별도 round
-**Next**: Step 3 사용자 리뷰 → 승인 시 §7.1 절차 → Step 4 진입 (작업 0 chunk padding 정책 검증)
-**Next task file**: `tasks/step_04_*.md` (현재 stub — 진입 전 확장 필요)
-**Branch**: `step/step_03_chunked_kv_store` (active, 리뷰 후 merge·삭제 예정)
+**Phase**: Phase 1 (Step 0~3) — Step 3 merge·tag 완료. Phase 1 종결. Phase 2 (Step 4~6) 진입 준비
+**완료**: Phase 0 전체 ✅ + Step 0 (tag `step_00_done`) ✅ + Step 1 (tag `step_01_done`) ✅ + Step 2 (tag `step_02_done`) ✅ + Step 3 (tag `step_03_done`) ✅
+**Next**: Step 4 진입 (작업 0 chunk padding 정책 검증, DECISIONS §13 v13 사전 가정 확정)
+**Next task file**: `tasks/step_04_*.md` (현재 stub — 진입 전 확장)
+**Branch**: `main` (Step 4 진입 시 step/step_04_* 브랜치 신설)
 
 ---
 
@@ -41,7 +40,7 @@
 | 0 | HF eager forward 결정론 | ✅ | step_00_determinism_report.md | invariant 0.1/0.2 ✅ (tag step_00_done) |
 | 1 | fork 동치성 검증 (fork된 코드 = HF 표준, no cache) | ✅ | step_01_fork_equivalence_report.md | invariant 1.1/1.2/1.3 ✅ (tag step_01_done) |
 | 2 | HF DynamicCache forward + padded cache K/V (옵션 B) | ✅ | step_02_dynamic_cache_report.md | invariant 2.1/2.2/2.3A ✅, 2.3B drift 6.20e-06 (gate ❌) (tag step_02_done) |
-| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | 🔵 리뷰 대기 | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0), 사용자 리뷰 후 merge/tag 대기 |
+| 3 | ChunkedKVStore 정확성 + HF Cache 인터페이스 호환성 | ✅ | step_03_chunked_kv_store_report.md | invariant 3.1·3.2·3.3A·3.3B 모두 PASS ✅ (vast.ai max_abs=0.0) (tag step_03_done) |
 | 4 | N chunks 따로 prefill → concat = vanilla | ⬜ | - | - |
 | 5 | 1 chunk reuse = vanilla | ⬜ | - | - |
 | 6 | N chunks reuse, recompute_ratio=1.0 = vanilla | ⬜ | - | - |
@@ -163,5 +162,6 @@ Step 3 final gate PASS 완료 + 보고서 작성 완료. 남은 것:
 - **2026-05-17 (Step 2 merge + Step 3 진입)**: Step 2 사용자 리뷰 승인 → main `--no-ff` merge (`71f9c03`), tag `step_02_done`, 브랜치 삭제 (로컬+원격). Step 3 진입 — 작업 0 (사전 확인): HF Cache 인터페이스 surface 직접 확인 (5 abstract methods), modeling_mistral.py 호출 패턴 (`update`/`get_seq_length`/`get_max_cache_shape`/`isinstance(Cache)`), DECISIONS §3.8의 ChunkedKVStore 명세 그대로 채택. 별도 결정 2건: (a) drift_budget Step 3 미적용 (모든 invariant same-shape), (b) chunk padding 정책 Step 4 작업 0으로 이연. Step 3 scope β 채택 — invariant 4개 (3.1 + 3.2 + 3.3A + 3.3B). 해석 A 채택 — Cache 상속 ❌, dataclass-like container. 작업 1·2·3·4 일괄 처리: task 파일 stub → 자체완결 12 섹션 확장, `src/compblend/cache.py` 신규 (ChunkMeta + ChunkedKVStore), `tasks/step_03_chunked_kv_store/run_chunked_kv_store_check.py` 신규, MacBook smoke 3.1·3.2·3.3A PASS. branch `step/step_03_chunked_kv_store` 생성·commit·push (`e2f9c00`).
 - **2026-05-17 (Step 3 hygiene + 3.3B vast.ai)**: hygiene commit (`72d1b5b`) — summary.json gate 분리 (`local_smoke_gate_passed`·`step_03_final_gate_passed`·`all_invariants_passed`) + 콘솔 3분기 + 3.3B diagnostic 13 fields + `_classify_3_3b_failure` 자동 판정. 알고리즘 ❌ 수정. MacBook smoke 재실행 PASS. vast.ai A100-SXM4-80GB (instance `36936503`, dph_total `$1.21/h`, running 322초, 추정 비용 ~$0.15) 에서 3.3B 검증 — **invariant 3.1·3.2·3.3A·3.3B 모두 PASS** ✅, `step_03_final_gate_passed=True`, `all_invariants_passed=True`. `logits_a_sha256 == logits_b_sha256 = e581d7f715cffb63...`, `max_abs_diff=0.0`, `mean_abs_diff=0.0`. decode 토큰 `5465="Paris"` (Step 0/1/2 일치). `failure_case=""` (Case 1/2/3 모두 배제). 결과 commit `e9449f0`. 인스턴스 destroy, 잔존 0개.
 - **2026-05-17 (Step 3 보고서 작성)**: `docs/reports/step_03_chunked_kv_store_report.md` 작성 (12 섹션) — §1 Summary, §2 Goal/Scope, §3 Environment (vast.ai + MacBook + 누적 비용 추정 Step 0~3 ~$1.36), §4 Implementation overview (해석 A · 5-step 절차 · Tensor shape), §5 Invariants/Gates (4 invariant + 3 gate fields), §6 MacBook smoke, §7 vast.ai 3.3B (diagnostic fields + failure case 자동 판정), §8 Key findings (6건), §9 Mechanism interpretation (왜 3.3B가 bitwise인가 — 3.1 + 결정론 prefill의 derived guarantee), §10 Limitations (11건), §11 Step 4 implications (작업 0 chunk padding 정책 검증), §12 Artifacts/commits/next. 필수 영문 문장 3건 (Cache 상속 ❌ · drift budget 미적용 · RoPE/chunk padding 이연) §4.2 / §1·§8 / §2·§10 배치. summary.json source of truth 재확인 — 직전 보고와 충돌 없음. 사용자 리뷰 대기. `main` merge·tag·브랜치 삭제는 별도 round.
+- **2026-05-18 (Step 3 merge·tag·삭제 + Phase 1 종결)**: 사용자 standing approval — overnight round 진입. Step 3 final gate PASS sanity 재확인 (step_03_final_gate_passed=true, logits SHA match, max_abs=0.0, failure_case=""). main `--no-ff` merge (`527fb92`), tag `step_03_done`, step 브랜치 삭제 (로컬+원격). 잔존 vast.ai 0개. **Phase 1 (Step 0~3) 종결**. Step 4 진입 준비.
 
 (이후 매 step 완료 시 여기에 한 줄씩 추가)
